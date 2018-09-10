@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="Sky&#39;s Blog">
 <meta property="og:description" content="前段时间在网上找开源的blog系统,最终发现了 Hexo, 觉得它简单明了,适合技术人的风格,利用 Hexo, 我做了一个自己的爱情纪念地, 最近开始想坚持写文章, 提升自己的技术能力,也是对自己知识的一种归纳, 所以第一篇文章献给 Hexo 咯~~">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-10T09:45:59.410Z">
+<meta property="og:updated_time" content="2018-09-10T09:47:43.628Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Hexo构建自己的blog">
 <meta name="twitter:description" content="前段时间在网上找开源的blog系统,最终发现了 Hexo, 觉得它简单明了,适合技术人的风格,利用 Hexo, 我做了一个自己的爱情纪念地, 最近开始想坚持写文章, 提升自己的技术能力,也是对自己知识的一种归纳, 所以第一篇文章献给 Hexo 咯~~">
@@ -312,7 +312,7 @@
 <p>将生成的 github_id_rsa.pub的文件内容复制, 放入 <a href="https://github.com/settings/ssh/new" target="_blank" rel="noopener">GitHub ssh key</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat github_id_rsa.pub</span><br></pre></td></tr></table></figure></p>
 <p>检测 GitHub 公钥设置是否成功，输入 (记住一定要设置 user.name和user.email, 还有 ssh-add, 否则可能一直会报错)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh git@github.com</span><br><span class="line">PTY allocation request failed on channel 0</span><br><span class="line">Hi 你的GitHub用户名! You<span class="string">'ve successfully authenticated, but GitHub does not provide shell access.</span></span><br><span class="line"><span class="string">Connection to github.com closed.</span></span><br></pre></td></tr></table></figure></p>
 <p>好了, 可以开始测试发布啦<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> your-hexo-root-path</span><br><span class="line">hexo clean&amp;&amp;hexo g -d</span><br></pre></td></tr></table></figure></p>
-<p>请查看你的  <a href="your-github-username.github.io">Online Blog</a> 吧.</p>
+<p>请查看你的  <a href="https://your-github-username.github.io" target="_blank" rel="noopener">Online Blog</a> 吧.</p>
 
       
     </div>
