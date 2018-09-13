@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="此文意在记录自己利用 docker 站在巨人的肩膀上构建 zookeeper + dubbo-admin + apollo 环境时的一些重要点, 供以后查阅回顾">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dubbo-apllo-docker">
+<meta property="og:url" content="https://skyhuangjing.github.io/2018/09/13/dubbo-apllo-docker/index.html">
+<meta property="og:site_name" content="Sky&#39;s Blog">
+<meta property="og:description" content="此文意在记录自己利用 docker 站在巨人的肩膀上构建 zookeeper + dubbo-admin + apollo 环境时的一些重要点, 供以后查阅回顾">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-13T07:25:03.120Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dubbo-apllo-docker">
+<meta name="twitter:description" content="此文意在记录自己利用 docker 站在巨人的肩膀上构建 zookeeper + dubbo-admin + apollo 环境时的一些重要点, 供以后查阅回顾">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://skyhuangjing.github.io/2018/09/13/dubbo-apllo-docker/"/>
+
+
+
+
+
+  <title>dubbo-apllo-docker | Sky's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sky's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skyhuangjing.github.io/2018/09/13/dubbo-apllo-docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sky huang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/kenan.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sky's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">dubbo-apllo-docker</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-13T10:30:05+08:00">
+                2018-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>此文意在记录自己利用 <a href="https://www.docker.com/" target="_blank" rel="noopener"><strong>docker</strong></a> 站在巨人的肩膀上构建 <a href="https://zookeeper.apache.org/" target="_blank" rel="noopener"><strong>zookeeper</strong></a> + <a href="https://github.com/apache/incubator-dubbo-ops" target="_blank" rel="noopener"><strong>dubbo-admin</strong></a> + <a href="https://github.com/ctripcorp/apollo" target="_blank" rel="noopener"><strong>apollo</strong></a> 环境时的一些重要点, 供以后查阅回顾<br><a id="more"></a></p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>为保证构建效果, 建立使用全新的 <strong>Linux</strong> 环境做测试, 本文的系统环境是最新的 <strong>CentOS 7</strong></p>
+<h2 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h2><h3 id="安装-参考文档"><a href="#安装-参考文档" class="headerlink" title="安装 参考文档"></a>安装 <a href="http://www.runoob.com/docker/centos-docker-install.html" target="_blank" rel="noopener">参考文档</a></h3><p>使用 <strong>sudo</strong> 或 <strong>root</strong> 权限登录 <strong>CentOS</strong></p>
+<p>确保 <strong>yum</strong> 包更新到最新。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo yum update</span><br></pre></td></tr></table></figure></p>
+<p>执行 <strong>Docker</strong> 安装脚本。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">$ sudo sh get-docker.sh</span><br></pre></td></tr></table></figure></p>
+<p>  执行这个脚本会添加 <strong>docker.repo</strong> 源并安装 <strong>Docker</strong>。</p>
+<p>启动 <strong>Docker</strong> 进程。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start docker</span><br></pre></td></tr></table></figure></p>
+<p>验证 <strong>docker</strong> 是否安装成功并在容器中执行一个测试的镜像。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo docker run hello-world</span><br><span class="line">docker ps</span><br></pre></td></tr></table></figure></p>
+<p>到此，<strong>Docker</strong> 在 <strong>CentOS</strong> 系统的安装完成。</p>
+<h2 id="Docker-Compose"><a href="#Docker-Compose" class="headerlink" title="Docker Compose"></a>Docker Compose</h2><h3 id="安装-参考文档-1"><a href="#安装-参考文档-1" class="headerlink" title="安装 参考文档"></a>安装 <a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">参考文档</a></h3><p>执行此命令获取最新版本的 <strong>Docker Compose</strong></p>
+<blockquote>
+<p>注意此命令中获取的 <strong>docker-compose</strong> 版本为<strong>1.22.0</strong>, 执行之前请获取最新的版本号 <a href="https://github.com/docker/compose/releases" target="_blank" rel="noopener">Compose repository release page on GitHub</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo curl -L <span class="string">"https://github.com/docker/compose/releases/download/1.22.0/docker-compose-<span class="variable">$(uname -s)</span>-<span class="variable">$(uname -m)</span>"</span> -o /usr/<span class="built_in">local</span>/bin/docker-compose</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>为 <strong>docker-compose</strong> 命令 赋可执行权限<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br></pre></td></tr></table></figure></p>
+<p>测试 <strong>docker-compose</strong> 是否安装成功<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker-compose --version</span><br><span class="line">docker-compose version 1.22.0, build 1719ceb</span><br></pre></td></tr></table></figure></p>
+<h2 id="Bin"><a href="#Bin" class="headerlink" title="Bin"></a>Bin</h2><p>为方便后续终端操作, 制作了一些<strong>bash</strong>脚本</p>
+<p>在 <strong>root</strong> 用户 目录下建立 <strong>bin</strong> 目录, 存放<strong>bash</strong>脚本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /root/bin</span><br><span class="line">mv bashmarks.sh  dkclean  dkin  dkps  dkrm  fport  net /root/bin</span><br><span class="line">ls -ll /root/bin</span><br><span class="line">-rwxr-xr-x. 1 root root 5056 Sep 11 03:18 bashmarks.sh </span><br><span class="line">-rwxr-xr-x. 1 root root   61 Sep 11 03:15 dkclean</span><br><span class="line">-rwxr-xr-x. 1 root root   43 Sep 11 03:15 dkin</span><br><span class="line">-rwxr-xr-x. 1 root root   27 Sep 11 03:15 dkps</span><br><span class="line">-rwxr-xr-x. 1 root root   44 Sep 11 03:15 dkrm</span><br><span class="line">-rwxr-xr-x. 1 root root  141 Sep 11 03:15 fport</span><br><span class="line">-rwxr-xr-x. 1 root root 1269 Sep 11 03:15 net</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><a href="https://github.com/huyng/bashmarks" target="_blank" rel="noopener"><strong>bashmarks.sh</strong></a> 一个终端书签脚本, 提供快速切换目录的功能, 具体使用请查看其 <a href="https://github.com/huyng/bashmarks" target="_blank" rel="noopener">Github Repo</a>  <br><br><strong>dkclean</strong> 清理 <strong>docker</strong> 未打标签的一些镜像 <br><br><strong>dkin $container_name</strong> 进入容器内部终端, <strong>$container_name</strong> 是需要进入的镜像名称 <br><br><strong>dkps</strong> 查看所有的容器  <br><br><strong>dkrm $container_name</strong> 停止容器,并删除此容器  <br><br><strong>fport $port</strong> 查看某个端口是否被占用, 以及列出一些必要信息  <br><br><strong>net</strong> 查看网络的配置情况</p>
+</blockquote>
+<p>修改 <strong>.bashrc</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi /root/.bashrc</span><br><span class="line"><span class="comment"># 添加一下脚本,并保存</span></span><br><span class="line"><span class="built_in">alias</span> vi=<span class="string">'vim'</span></span><br><span class="line"><span class="built_in">source</span> /root/bin/bashmarks.sh</span><br></pre></td></tr></table></figure></p>
+<p>保存并使其生效<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> /root/.bashrc</span><br></pre></td></tr></table></figure></p>
+<h2 id="Portainer"><a href="#Portainer" class="headerlink" title="Portainer"></a><a href="https://portainer.io/install.html" target="_blank" rel="noopener">Portainer</a></h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>复制此内容, 并命文件名称为 <strong>docker-compose.yml</strong></p>
+<blockquote>
+<p>此 <strong>stack</strong> 会绑定主机的 <strong>19000</strong>(Portainer web) 端口, 此自行修改<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  portainer:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">portainer/portainer</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"19000:9000"</span></span><br><span class="line"><span class="attr">    command:</span> <span class="bullet">-H</span> <span class="attr">unix:///var/run/docker.sock</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/var/run/docker.sock:/var/run/docker.sock</span></span><br><span class="line"><span class="attr">      - portainer_data:</span><span class="string">/data</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line"><span class="attr">  portainer_data:</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>在此文件存放的目录下, 执行此命令, 以后台进程的形式启动 <strong>Portainer</strong></p>
+<blockquote>
+<p>如果要测试, 可以不加参数 <strong>-d</strong>, 以前台进程启动 <strong>Portainer</strong>,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>访问 <a href=""><strong>SERVER_IP:19000</strong></a>, 查看 <strong>Portainer</strong> 管理界面</p>
+<h1 id="Zookeeper-Dubbo-Admin"><a href="#Zookeeper-Dubbo-Admin" class="headerlink" title="Zookeeper + Dubbo Admin"></a>Zookeeper + Dubbo Admin</h1><p>利用 <strong>Docker</strong> 构建 <strong>Zookeeper</strong> 集群 <a href="https://www.jianshu.com/p/98bb69256cc3" target="_blank" rel="noopener">参考文档</a></p>
+<p>利用 <strong>Docker</strong> 构建 <strong>Dubbo-Admin</strong> <a href="https://github.com/chenchuxin/dubbo-admin-docker" target="_blank" rel="noopener">参考文档</a></p>
+<p>复制此内容, 并命文件名称为 <strong>docker-compose.yml</strong></p>
+<blockquote>
+<p>此 <strong>stack</strong> 会绑定主机的 <strong>2181</strong>(Zookeeper),<strong>2182</strong>(Zookeeper),<strong>2183</strong>(Zookeeper),<strong>18080</strong>(Dubbo admin) 端口, 若需要修改, 请确保了解的端口之间的关系并对后续 <strong>Dubbo</strong> 服务注册非常了解, 确保修改无误 <br> <strong>Dubbo Admin</strong> 放在此 <strong>stack</strong> 中, 原因是方便 <strong>Dubbo Admin</strong> 访问 <strong>Zookeeper</strong> 集群, 若生产部署, 建议分离部署<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  zoo1:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">zookeeper</span></span><br><span class="line"><span class="attr">    restart:</span> <span class="string">always</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">zoo1</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">zookeeper_1</span></span><br><span class="line">    <span class="comment">#domainname: </span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">2181</span><span class="string">:2181</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/usr/local/docker_app/zookeeper/zoo1/data:/data</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/usr/local/docker_app/zookeeper/zoo1/datalog:/datalog</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      ZOO_MY_ID:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">      ZOO_SERVERS:</span> <span class="string">server.1=zoo1:2888:3888</span> <span class="string">server.2=zoo2:2888:3888</span> <span class="string">server.3=zoo3:2888:3888</span></span><br><span class="line"><span class="attr">    networks:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_net</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  zoo2:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">zookeeper</span></span><br><span class="line"><span class="attr">    restart:</span> <span class="string">always</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">zoo2</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">zookeeper_2</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">2182</span><span class="string">:2181</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/usr/local/docker_app/zookeeper/zoo2/data:/data</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/usr/local/docker_app/zookeeper/zoo2/datalog:/datalog</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      ZOO_MY_ID:</span> <span class="number">2</span></span><br><span class="line"><span class="attr">      ZOO_SERVERS:</span> <span class="string">server.1=zoo1:2888:3888</span> <span class="string">server.2=zoo2:2888:3888</span> <span class="string">server.3=zoo3:2888:3888</span></span><br><span class="line"><span class="attr">    networks:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_net</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  zoo3:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">zookeeper</span></span><br><span class="line"><span class="attr">    restart:</span> <span class="string">always</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">zoo3</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">zookeeper_3</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">2183</span><span class="string">:2181</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/usr/local/docker_app/zookeeper/zoo3/data:/data</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">/usr/local/docker_app/zookeeper/zoo3/datalog:/datalog</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      ZOO_MY_ID:</span> <span class="number">3</span></span><br><span class="line"><span class="attr">      ZOO_SERVERS:</span> <span class="string">server.1=zoo1:2888:3888</span> <span class="string">server.2=zoo2:2888:3888</span> <span class="string">server.3=zoo3:2888:3888</span></span><br><span class="line"><span class="attr">    networks:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_net</span></span><br><span class="line"><span class="attr">  admin:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">chenchuxin/dubbo-admin</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">18080</span><span class="string">:8080</span></span><br><span class="line"><span class="attr">    links:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_1</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_2</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_3</span></span><br><span class="line"><span class="attr">    networks:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zookeeper_net</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">dubbo.registry.address=zookeeper://zookeeper_1:2181|zookeeper://zookeeper_2:2181|zookeeper://zookeeper_3:2181</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zoo1</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zoo2</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">zoo3</span></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line"><span class="attr">   zookeeper_net:</span></span><br><span class="line"><span class="attr">    driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>在此文件存放的目录下, 执行此命令, 以后台进程的形式启动 <strong>Zookeeper</strong> 集群 和 <strong>Dubbo Admin</strong> </p>
+<blockquote>
+<p>如果要测试, 可以不加参数 <strong>-d</strong>, 以前台进程启动,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>访问 <a href=""><strong>SERVER_IP:18080</strong></a>, 查看 <strong>Dubbo Admin</strong> 管理界面</p>
+<ul>
+<li>管理员: <strong>root</strong> 密码: <strong>root</strong></li>
+<li>游客: <strong>guest 密码 </strong>guest**</li>
+</ul>
+<h2 id="Apollo"><a href="#Apollo" class="headerlink" title="Apollo"></a><a href="https://github.com/ctripcorp/apollo" target="_blank" rel="noopener">Apollo</a></h2><p>利用 <strong>Docker</strong> 构建 <strong>Apollo</strong> 配置中心 <a href="https://github.com/idoop/docker-apollo" target="_blank" rel="noopener">参考文档</a></p>
+<p>准备数据库文件 <a href="https://github.com/ctripcorp/apollo/wiki/%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97#21-%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93" target="_blank" rel="noopener">参考文档</a></p>
+<p>本文利用官方提供的<a href="https://github.com/ctripcorp/apollo/tree/master/scripts/docker-quick-start/sql" target="_blank" rel="noopener">数据库初始化文件</a>, 进行改造, 达到几个目的</p>
+<ul>
+<li>官方的文件会删除原有的数据库数据, 修改所有建表语句, 确保只新增, 不删除</li>
+<li><p>官方提供的两个文件, 是两个数据库 <strong>Portal</strong> 和 <strong>Config</strong>, 本文提供的容器文档配置需两个 <strong>Config</strong> 数据库, 因此在原有的基础上, 复制一份, 并修改原有数据库名称, 最终会生成三个数据库文件 <strong>Portal</strong>(Apollo Portal管理数据库) <strong>Dev Config</strong>(Dev环境数据库) <strong>Fat Config</strong>(Fat环境数据库)</p>
+<ul>
+<li><p><strong>apolloportaldb.sql</strong></p>
+</li>
+<li><p><strong>apolloconfigdbdev.sql</strong></p>
+</li>
+<li><p><strong>apolloconfigdbfat.sql</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>将上述文件制作的几个文件放在一个名为 <strong>sql</strong> 的文件夹,之后复制此内容, 并命文件名称为 <strong>docker-compose.yml</strong>, 放在与 <strong>sql</strong> 文件夹同级的目录</p>
+<blockquote>
+<p>此 stack 会绑定主机 <strong>28070</strong> (Apollo Portal), <strong>28080</strong> (FAT Config),<strong>28081</strong> (FAT Config), <strong>28090</strong> (Dev Admin), <strong>28091</strong> (FAT Admin), <strong>23306</strong>(MYSQL) 以及会在当前文件夹的创建 <strong>log</strong> 目录(容器运行时的日志), <strong>data</strong> 目录(数据库运行时的数据)</p>
+</blockquote>
+<blockquote>
+<p> 此文件会开启两个运行环境: <strong>DEV,FAT</strong>, 大家可根据自己的需要, 对应配置相应的参数<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  apollo:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">idoop/docker-apollo:latest</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">apollo</span></span><br><span class="line"><span class="attr">    restart:</span> <span class="string">always</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">./logs:/opt</span></span><br><span class="line"><span class="comment"># 启动前,确认对应环境的数据库已经建立，否则apollo无法启动.</span></span><br><span class="line"><span class="comment"># 默认端口:portal:8070; dev:8080,8090; fat:8081,8091; uat:8082,8092; pro:8083,8093</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      PORTAL_DB:</span> <span class="attr">jdbc:mysql://apollo-db:3306/ApolloPortalDB?characterEncoding=utf8</span></span><br><span class="line"><span class="attr">      PORTAL_DB_USER:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">      PORTAL_DB_PWD:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">      PORTAL_PORT:</span> <span class="number">28070</span></span><br><span class="line"></span><br><span class="line"><span class="attr">      DEV_DB:</span> <span class="attr">jdbc:mysql://apollo-db:3306/ApolloConfigDBDev?characterEncoding=utf8</span></span><br><span class="line"><span class="attr">      DEV_DB_USER:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">      DEV_DB_PWD:</span> <span class="string">password</span></span><br><span class="line">      <span class="comment"># DEV_IP: 10.1.11.217</span></span><br><span class="line"><span class="attr">      DEV_ADMIN_PORT:</span> <span class="number">28090</span></span><br><span class="line"><span class="attr">      DEV_CONFIG_PORT:</span> <span class="number">28080</span></span><br><span class="line"></span><br><span class="line"><span class="attr">      FAT_DB:</span> <span class="attr">jdbc:mysql://apollo-db:3306/ApolloConfigDBFat?characterEncoding=utf8</span></span><br><span class="line"><span class="attr">      FAT_DB_USER:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">      FAT_DB_PWD:</span> <span class="string">password</span></span><br><span class="line">      <span class="comment"># FAT_IP: 10.1.11.217</span></span><br><span class="line"><span class="attr">      FAT_ADMIN_PORT:</span> <span class="number">28091</span></span><br><span class="line"><span class="attr">      FAT_CONFIG_PORT:</span> <span class="number">28081</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">#UAT_DB: jdbc:mysql://apollo-db:3306/ApolloConfigDBUat?characterEncoding=utf8</span></span><br><span class="line"><span class="attr">      UAT_DB_USER:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">      UAT_DB_PWD:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">      UAT_IP:</span> <span class="string">localhost</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">#PRO_DB: jdbc:mysql://apollo-db:3306/ApolloConfigDBPro?characterEncoding=utf8</span></span><br><span class="line"><span class="attr">      PRO_DB_USER:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">      PRO_DB_PWD:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">      PRO_IP:</span> <span class="string">localhost</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">apollo-db</span></span><br><span class="line"><span class="attr">    links:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">apollo-db</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"28070:28070"</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"28090:28090"</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"28080:28080"</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"28081:28081"</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"28091:28091"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  apollo-db:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="attr">mysql:5.7</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">apollo-db</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      TZ:</span> <span class="string">Asia/Shanghai</span></span><br><span class="line"><span class="attr">      MYSQL_ROOT_PASSWORD:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">apollo-dbdata</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"23306:3306"</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">./sql:/docker-entrypoint-initdb.d</span></span><br><span class="line"><span class="attr">    volumes_from:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">apollo-dbdata</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  apollo-dbdata:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="attr">alpine:latest</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">apollo-dbdata</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">./data:/var/lib/mysq</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>在此文件存放的目录下, 执行此命令, 以后台进程的形式启动 <strong>Apollo</strong></p>
+<blockquote>
+<p>如果要测试, 可以不加参数 <strong>-d</strong>, 以前台进程启动,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>待启动后, 利用 <strong>Navicat</strong> 访问 <strong>Apollo</strong> 数据库, 修改相关配置</p>
+<ul>
+<li><strong>ApolloPortalDB.ServerConfig</strong><ul>
+<li><strong>apollo.portal.envs</strong> = <strong>dev,fat</strong></li>
+</ul>
+</li>
+<li><strong>ApolloConfigDBDev.ServerConfig</strong><ul>
+<li><strong>eureka.service.url</strong> = <strong><a href="http://localhost:28080/eureka/" target="_blank" rel="noopener">http://localhost:28080/eureka/</a></strong></li>
+</ul>
+</li>
+<li><strong>ApolloConfigDBFat.ServerConfig</strong><ul>
+<li><strong>eureka.service.url</strong> = <strong><a href="http://localhost:28081/eureka/" target="_blank" rel="noopener">http://localhost:28081/eureka/</a></strong></li>
+</ul>
+</li>
+</ul>
+<p>修改后, 重启 <strong>Apollo</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose down &amp;&amp; docker-compose up -d</span><br></pre></td></tr></table></figure></p>
+<p>待启动以后, 访问 <a href=""><strong>SERVER_IP:28070</strong></a>, 查看 Apollo Portal 管理界面</p>
+<ul>
+<li>管理员: <strong>apollo</strong> 密码: <strong>admin</strong></li>
+</ul>
+<p>至此服务器端, 必备的环境已经搭建完毕.</p>
+<h2 id="Pinpoint-可选"><a href="#Pinpoint-可选" class="headerlink" title="Pinpoint (可选)"></a><a href="https://github.com/naver/pinpoint" target="_blank" rel="noopener">Pinpoint</a> (可选)</h2><p> 介绍一个 <strong>Dubbo</strong> 平台推荐的一个APM工具 <strong>Pinpoint</strong>, 用于后续线上环境性能分析 <a href="https://dubbo.incubator.apache.org/en-us/docs/admin/ops/pinpoint.html" target="_blank" rel="noopener">介绍文档</a></p>
+<p>利用 <strong>Docker</strong> 构建 <strong>Pinpoint</strong>, <a href="https://github.com/naver/pinpoint-docker" target="_blank" rel="noopener">官方文档</a>提供了很详细的说明介绍, 在此就不在赘述, 只说明几个关键的几个地方</p>
+<ul>
+<li>因 stack 会绑定多个主机端口, 例如启用的 <strong>zookeeper</strong> 会占用  <strong>2181</strong> 端口, <strong>在不完全了解的情况下, 不建议修改其默认配置, 请在一个全新的服务器环境下进行安装</strong></li>
+<li>默认提供的配置, 会启动 <strong>pinpoint-quickstart</strong> 和 <strong>pinpoint-agent</strong>, 这两个只是官方提供的例子, 实际使用过程中, 请注释掉这两个容器</li>
+<li>容器启动以后, 需要手动上传 <strong>Flink Job</strong>, 可按照<a href="https://github.com/naver/pinpoint-docker#flink-configuration" target="_blank" rel="noopener">官方文档</a>进行操作</li>
+<li>容器主要对外提供的端口有 <ul>
+<li>Flink: <strong>8081</strong></li>
+<li>采集: <strong>9994</strong>,<strong>9995</strong>,<strong>9996</strong> </li>
+<li>WEB UI: <strong>8079</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong>pinpoint-agent</strong> 本身只需要配置 <strong>pinpoint-colletor</strong> 的 <strong>IP</strong> 即可.参考<a href="http://naver.github.io/pinpoint/installation.html#configuration-2" target="_blank" rel="noopener">官方文档</a></p>
+<p><a href="https://gitlab.zenlayer.net/guoxin/pinpoint/blob/master/pinpoint-agent/pinpoint.config.default" target="_blank" rel="noopener">pinpoint.config</a> 是默认的 <strong>pinpoint-agent</strong> 配置文件, <strong>pinpoint-colletor</strong> 的 <strong>IP</strong> 是 <strong>127.0.0.1</strong>, 请按照上述配置的 <strong>pinpoint</strong> 主机IP, 修改以下文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler.collector.ip=$your-pinpoint-pinpoint-host-ip</span><br></pre></td></tr></table></figure>
+<p><a href="https://gitlab.zenlayer.net/guoxin/pinpoint/blob/master/pinpoint-agent/startup-with-pinpoint.sh" target="_blank" rel="noopener">startup-with-pinpoint.sh</a>是利用 <strong>Tomcat</strong> 的 <strong>startup.sh</strong> 制作的启动脚本(不属于 <strong>pinpoint-agent</strong>)</p>
+<p><strong>AGENT_PATH</strong> 是需要配置代理的服务器上 <strong>pinpoint-agent</strong> 的根目录</p>
+<p><strong>AGENT_ID</strong> 是针对当前需要配置的 <strong>Tomcat</strong> 定义的 <strong>pinpoint</strong> 全局<strong>唯一 ID</strong>(不建议重复)</p>
+<p><strong>APPLICATION_NAME</strong> 是针对当前需要配置的 <strong>Tomcat</strong> 定义的 <strong>pinpoint</strong> 全局<strong>唯一名称</strong>(不建议重复)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">AGENT_PATH=&quot;/home/root/pinpoint-agent&quot;</span><br><span class="line">VERSION=&quot;1.7.3&quot;</span><br><span class="line">AGENT_ID=&quot;oss_pd&quot;</span><br><span class="line">APPLICATION_NAME=&quot;oss_pd&quot;</span><br><span class="line">JAVA_OPTS=&quot;$JAVA_OPTS  -javaagent:$AGENT_PATH/pinpoint-bootstrap-$VERSION.jar&quot;</span><br><span class="line">JAVA_OPTS=&quot;$JAVA_OPTS -Dpinpoint.agentId=$AGENT_ID&quot;</span><br><span class="line">JAVA_OPTS=&quot;$JAVA_OPTS -Dpinpoint.applicationName=$APPLICATION_NAME&quot;</span><br><span class="line">export JAVA_OPTS</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/10/hexo-github/" rel="next" title="使用Hexo构建自己的blog">
+                <i class="fa fa-chevron-left"></i> 使用Hexo构建自己的blog
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/kenan.jpg"
+                alt="Sky huang" />
+            
+              <p class="site-author-name" itemprop="name">Sky huang</p>
+              <p class="site-description motion-element" itemprop="description">code nothing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:sky_1994@outlook.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/SKYhuangjing" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前提条件"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker"><span class="nav-number">2.</span> <span class="nav-text">Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-参考文档"><span class="nav-number">2.1.</span> <span class="nav-text">安装 参考文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-Compose"><span class="nav-number">3.</span> <span class="nav-text">Docker Compose</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-参考文档-1"><span class="nav-number">3.1.</span> <span class="nav-text">安装 参考文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bin"><span class="nav-number">4.</span> <span class="nav-text">Bin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Portainer"><span class="nav-number">5.</span> <span class="nav-text">Portainer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">5.1.</span> <span class="nav-text">安装</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Zookeeper-Dubbo-Admin"><span class="nav-number"></span> <span class="nav-text">Zookeeper + Dubbo Admin</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Apollo"><span class="nav-number">1.</span> <span class="nav-text">Apollo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pinpoint-可选"><span class="nav-number">2.</span> <span class="nav-text">Pinpoint (可选)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sky huang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
