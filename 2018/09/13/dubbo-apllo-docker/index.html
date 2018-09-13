@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="Sky&#39;s Blog">
 <meta property="og:description" content="此文意在记录自己利用 docker 站在巨人的肩膀上构建 zookeeper + dubbo-admin + apollo 环境时的一些重要点, 供以后查阅回顾">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-13T08:03:03.445Z">
+<meta property="og:updated_time" content="2018-09-13T08:13:58.384Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="dubbo-apllo-docker">
 <meta name="twitter:description" content="此文意在记录自己利用 docker 站在巨人的肩膀上构建 zookeeper + dubbo-admin + apollo 环境时的一些重要点, 供以后查阅回顾">
@@ -330,8 +330,8 @@
 <blockquote>
 <p>如果要测试, 可以不加参数 <strong>-d</strong>, 以前台进程启动 <strong>Portainer</strong>,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure></p>
 </blockquote>
-<p>访问 <a href=""><strong>SERVER_IP:19000</strong></a>, 查看 <strong>Portainer</strong> 管理界面</p>
-<h1 id="Zookeeper-Dubbo-Admin"><a href="#Zookeeper-Dubbo-Admin" class="headerlink" title="Zookeeper + Dubbo Admin"></a>Zookeeper + Dubbo Admin</h1><p>利用 <strong>Docker</strong> 构建 <strong>Zookeeper</strong> 集群 <a href="https://www.jianshu.com/p/98bb69256cc3" target="_blank" rel="noopener">参考文档</a></p>
+<p>访问 <a href="SERVER_IP:19000"><strong>SERVER_IP:19000</strong></a>, 查看 <strong>Portainer</strong> 管理界面</p>
+<h2 id="Zookeeper-Dubbo-Admin"><a href="#Zookeeper-Dubbo-Admin" class="headerlink" title="Zookeeper + Dubbo Admin"></a>Zookeeper + Dubbo Admin</h2><p>利用 <strong>Docker</strong> 构建 <strong>Zookeeper</strong> 集群 <a href="https://www.jianshu.com/p/98bb69256cc3" target="_blank" rel="noopener">参考文档</a></p>
 <p>利用 <strong>Docker</strong> 构建 <strong>Dubbo-Admin</strong> <a href="https://github.com/chenchuxin/dubbo-admin-docker" target="_blank" rel="noopener">参考文档</a></p>
 <p>复制此内容, 并命文件名称为 <a href="https://github.com/SKYhuangjing/Docker-Zookeeper-DubboOps-Apollo/blob/master/zookeeper%26dubboOps/docker-compose.yml" target="_blank" rel="noopener"><strong>docker-compose.yml</strong></a></p>
 <blockquote>
@@ -341,7 +341,7 @@
 <blockquote>
 <p>如果要测试, 可以不加参数 <strong>-d</strong>, 以前台进程启动,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure></p>
 </blockquote>
-<p>访问 <a href=""><strong>SERVER_IP:18080</strong></a>, 查看 <strong>Dubbo Admin</strong> 管理界面</p>
+<p>访问 <a href="SERVER_IP:18080"><strong>SERVER_IP:18080</strong></a>, 查看 <strong>Dubbo Admin</strong> 管理界面</p>
 <ul>
 <li>管理员: <strong>root</strong> 密码: <strong>root</strong></li>
 <li>游客: <strong>guest</strong> 密码 <strong>guest</strong></li>
@@ -580,7 +580,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前提条件"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker"><span class="nav-number">2.</span> <span class="nav-text">Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-参考文档"><span class="nav-number">2.1.</span> <span class="nav-text">安装 参考文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-Compose"><span class="nav-number">3.</span> <span class="nav-text">Docker Compose</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-参考文档-1"><span class="nav-number">3.1.</span> <span class="nav-text">安装 参考文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bin"><span class="nav-number">4.</span> <span class="nav-text">Bin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Portainer"><span class="nav-number">5.</span> <span class="nav-text">Portainer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">5.1.</span> <span class="nav-text">安装</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Zookeeper-Dubbo-Admin"><span class="nav-number"></span> <span class="nav-text">Zookeeper + Dubbo Admin</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Apollo"><span class="nav-number">1.</span> <span class="nav-text">Apollo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pinpoint-可选"><span class="nav-number">2.</span> <span class="nav-text">Pinpoint (可选)</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前提条件"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker"><span class="nav-number">2.</span> <span class="nav-text">Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-参考文档"><span class="nav-number">2.1.</span> <span class="nav-text">安装 参考文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-Compose"><span class="nav-number">3.</span> <span class="nav-text">Docker Compose</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-参考文档-1"><span class="nav-number">3.1.</span> <span class="nav-text">安装 参考文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bin"><span class="nav-number">4.</span> <span class="nav-text">Bin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Portainer"><span class="nav-number">5.</span> <span class="nav-text">Portainer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">5.1.</span> <span class="nav-text">安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zookeeper-Dubbo-Admin"><span class="nav-number">6.</span> <span class="nav-text">Zookeeper + Dubbo Admin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apollo"><span class="nav-number">7.</span> <span class="nav-text">Apollo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pinpoint-可选"><span class="nav-number">8.</span> <span class="nav-text">Pinpoint (可选)</span></a></li></ol></div>
             
 
           </div>
