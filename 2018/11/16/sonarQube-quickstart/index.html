@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SonarQube 作为一款开源的代码质量检测工具, 非常适合有代码把控质量的需求的开发人员使用, 此篇文章将介绍如何快速的搭起一个 SonarQube 的运行环境, 以及在实际代码中使用到 SonarQube 提供的分析工具来做代码质量检测">
+<meta name="keywords" content="SonarQube">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SonarQube QuickStart">
+<meta property="og:url" content="https://skyhuangjing.github.io/2018/11/16/sonarQube-quickstart/index.html">
+<meta property="og:site_name" content="Sky&#39;s Blog">
+<meta property="og:description" content="SonarQube 作为一款开源的代码质量检测工具, 非常适合有代码把控质量的需求的开发人员使用, 此篇文章将介绍如何快速的搭起一个 SonarQube 的运行环境, 以及在实际代码中使用到 SonarQube 提供的分析工具来做代码质量检测">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/sonarQube-quickstart/scm.jpg">
+<meta property="og:updated_time" content="2018-11-16T04:54:48.736Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SonarQube QuickStart">
+<meta name="twitter:description" content="SonarQube 作为一款开源的代码质量检测工具, 非常适合有代码把控质量的需求的开发人员使用, 此篇文章将介绍如何快速的搭起一个 SonarQube 的运行环境, 以及在实际代码中使用到 SonarQube 提供的分析工具来做代码质量检测">
+<meta name="twitter:image" content="https://skyhuangjing.github.io/images/sonarQube-quickstart/scm.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://skyhuangjing.github.io/2018/11/16/sonarQube-quickstart/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SonarQube QuickStart | Sky's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sky's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume-cn">
+    <a href="/resumes/resume-cn.html" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card"></i> <br>简历 (中文)</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume-eng">
+    <a href="/resumes/resume-eng.html" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card"></i> <br>简历 (英文)</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skyhuangjing.github.io/2018/11/16/sonarQube-quickstart/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sky huang">
+      <meta itemprop="description" content="code nothing">
+      <meta itemprop="image" content="/uploads/kenan.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sky's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SonarQube QuickStart
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-16 10:59:22 / 修改时间：12:54:48" itemprop="dateCreated datePublished" datetime="2018-11-16T10:59:22+08:00">2018-11-16</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.sonarqube.org/" target="_blank" rel="noopener"><strong>SonarQube</strong></a> 作为一款开源的代码质量检测工具, 非常适合有代码把控质量的需求的开发人员使用, 此篇文章将介绍如何快速的搭起一个 <strong>SonarQube</strong> 的运行环境, 以及在实际代码中使用到 <strong>SonarQube</strong> 提供的分析工具来做代码质量检测</p>
+<a id="more"></a>
+<h2 id="SonarQube-安装"><a href="#SonarQube-安装" class="headerlink" title="SonarQube 安装"></a><strong>SonarQube</strong> 安装</h2><p>现在安装所有的工具, 我都倾向于使用 <strong>Docker</strong> 作为第一首选安装途径, 在<strong>Github</strong> 查看了 <strong>SonarQube</strong> 的开源项目后, 找到了官方提供的 <strong>Dockerfile</strong> 项目 <a href="https://github.com/SonarSource/docker-sonarqube" target="_blank" rel="noopener"><strong>docker-sonarqube</strong></a></p>
+<p>在 <strong>Dokcer Hub</strong> 上 我们可以看到其<a href="https://hub.docker.com/_/sonarqube/" target="_blank" rel="noopener">官方镜像</a>的最新版本, 笔者现在看到的是7.1版本</p>
+<p>查看完 <strong>Dockerfile</strong> 之后, 我们开始制作 <strong>docker-compose.yml</strong> 文件</p>
+<ul>
+<li>我们的服务器上直接创建一个 <strong>sonar</strong> 的文件夹, 来放置我们的 <strong>docker-compose.yml</strong><blockquote>
+<p>此文件夹位置可随意, 按自己的喜好即可</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir sonar</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ul>
+<p><br>创建 <strong>docker-compose.yml</strong></p>
+<blockquote>
+<p><strong>[sonarWebUIPort]</strong> : 对外提供 <strong>SonarQube</strong> 服务的端口 <br><br><strong>[jdbc-user]</strong> : <strong>SonarQube</strong> 存放数据, 用于 <strong>JDBC</strong> 访问的用户名<br><br><strong>[jdbc-password]</strong> : <strong>SonarQube</strong> 存放数据, 用于 <strong>JDBC</strong> 访问的密码<br><br><strong>[your-mysqlIP]</strong> : <strong>SonarQube</strong> 存放数据, 用于 <strong>JDBC</strong> 访问的数据库地址<br><br><strong>[your-mysqlPort]</strong> : <strong>SonarQube</strong> 存放数据, 用于 <strong>JDBC</strong> 访问的数据库端口<br><br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">"3"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  sonarqube:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="attr">sonarqube:7.1</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">sonar</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">[sonarWebUIPort]:9000</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">29092</span><span class="string">:9092</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">SONARQUBE_JDBC_USERNAME=[jdbc-user]</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">SONARQUBE_JDBC_PASSWORD=[jdbc-password]</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">SONARQUBE_JDBC_URL=jdbc:mysql://[your-mysqlIP]:[your-mysqlPort]/sonar?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>制作好以后, 利用 <strong>docker-compose</strong> 命令启动容器</p>
+<blockquote>
+<p>建议第一次启动, 不要加参数 -d, 便于查看启动日志<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>启动完成以后, 我们可以访问 <a href=""><strong>服务器IP:sonarWebUIPort</strong></a> 查看是否启动成功</p>
+<p>如需登录, 可使用默认用户名密码 admin/admin</p>
+<h2 id="SonarQube-扫描"><a href="#SonarQube-扫描" class="headerlink" title="SonarQube 扫描"></a><strong>SonarQube</strong> 扫描</h2><p>在安装好了 <strong>SonarQube</strong> 环境以后, 我们开始对我们的代码进行扫描检测, <strong>SonarQube</strong> 官方有提供非常详细的<a href="https://github.com/SonarSource/sonar-scanning-examples" target="_blank" rel="noopener">例子</a>,<br>因为我们的项目代码使用 <strong>ant</strong> 进行构建, 所以这里我们关注 <a href="https://github.com/SonarSource/sonar-scanning-examples/blob/master/sonarqube-scanner-ant/README.md" target="_blank" rel="noopener"><strong>ant-example</strong></a>, 其他的常见的有 <strong>maven</strong>, <strong>gradle</strong>, 大家可按照实际情况进行配置</p>
+<h3 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h3><ul>
+<li><a href="http://www.sonarqube.org/downloads/" target="_blank" rel="noopener">SonarQube</a> 5.6+</li>
+<li><a href="http://redirect.sonarsource.com/doc/ant-task.html" target="_blank" rel="noopener">SonarQube Scanner for Ant</a> 2.5+</li>
+<li><a href="http://ant.apache.org/" target="_blank" rel="noopener">Ant</a> 1.7.1 or higher</li>
+</ul>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><p>配置 <strong>ant</strong> 构建脚本</p>
+<blockquote>
+<p>因为每人的 <strong>ant</strong> 编译脚本都不太相同, 所以此处只说明一些必要的配置项 <br></p>
+<ul>
+<li>请在 <strong>project</strong> 中加入 xmlns:sonar=”antlib:org.sonar.ant</li>
+<li>请配置自己本地的 <strong>sonar_ant_scaner_lib</strong> </li>
+<li>请配置自己项目的 <strong>src.dir</strong>, <strong>build.dir</strong>, <strong>classes.dir</strong></li>
+<li>请配置自己项目的 <strong>sonar.host.url</strong></li>
+<li>请配置自己项目的 <strong>sonar.binaries</strong>, <strong>sonar.java.binaries</strong></li>
+</ul>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" ?&gt; </span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">name</span>=<span class="string">"ant example"</span> <span class="attr">default</span>=<span class="string">"sonar"</span> <span class="attr">basedir</span>=<span class="string">"."</span> <span class="attr">xmlns:sonar</span>=<span class="string">"antlib:org.sonar.ant"</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar_ant_scaner_lib"</span> <span class="attr">value</span>=<span class="string">"/Users/sky/zenlayer/sonar_ant_scaner_lib"</span> /&gt;</span> </span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- ========= Define the main properties of this project ========= --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"src.dir"</span> <span class="attr">value</span>=<span class="string">"src"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"build.dir"</span> <span class="attr">value</span>=<span class="string">"dist"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"classes.dir"</span> <span class="attr">value</span>=<span class="string">"$&#123;build.dir&#125;/classes"</span> /&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">&lt;!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.host.url"</span> <span class="attr">value</span>=<span class="string">"http://10.1.10.217:29000"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- Define the Sonar properties --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.projectKey"</span> <span class="attr">value</span>=<span class="string">"org.sonarqube:sonarqube-scanner-ant"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.projectName"</span> <span class="attr">value</span>=<span class="string">"ant example"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.projectVersion"</span> <span class="attr">value</span>=<span class="string">"1.0"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.language"</span> <span class="attr">value</span>=<span class="string">"java"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.sources"</span> <span class="attr">value</span>=<span class="string">"src"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.binaries"</span> <span class="attr">value</span>=<span class="string">"dist"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.java.binaries"</span> <span class="attr">value</span>=<span class="string">"dist"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sonar.sourceEncoding"</span> <span class="attr">value</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- ========= Define SonarQube Scanner for Ant Target ========= --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">target</span> <span class="attr">name</span>=<span class="string">"sonar"</span> <span class="attr">depends</span>=<span class="string">"compile"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">taskdef</span> <span class="attr">uri</span>=<span class="string">"antlib:org.sonar.ant"</span> <span class="attr">resource</span>=<span class="string">"org/sonar/ant/antlib.xml"</span>&gt;</span></span><br><span class="line">			<span class="comment">&lt;!-- Update the following line, or put the "sonar-ant-task-*.jar" file in your "$HOME/.ant/lib" folder --&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">classpath</span> <span class="attr">path</span>=<span class="string">"$&#123;sonar_ant_scaner_lib&#125;/sonarqube-ant-task-2.5.jar"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">taskdef</span>&gt;</span></span><br><span class="line">		</span><br><span class="line">		<span class="comment">&lt;!-- Execute SonarQube Scanner for Ant Analysis --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">sonar:sonar</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">	</span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>制作好以后, 我们可以启动 <strong>sonarQube scanner</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> your-project-root-floder</span><br><span class="line">ant -f your-ant-filename.xml sonar</span><br></pre></td></tr></table></figure></p>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li>如果项目中使用 SVN 了, 那么需要配置 SVN 账号<br><img src="/images/sonarQube-quickstart/scm.jpg" alt=""></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SonarQube/" rel="tag"># SonarQube</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/15/stripe-quickstart/" rel="next" title="Stripe Intergration">
+                <i class="fa fa-chevron-left"></i> Stripe Intergration
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/kenan.jpg" alt="Sky huang">
+            
+              <p class="site-author-name" itemprop="name">Sky huang</p>
+              <p class="site-description motion-element" itemprop="description">code nothing</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/SKYhuangjing" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:sky_1994@outlook.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SonarQube-安装"><span class="nav-number">1.</span> <span class="nav-text">SonarQube 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SonarQube-扫描"><span class="nav-number">2.</span> <span class="nav-text">SonarQube 扫描</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前提条件"><span class="nav-number">2.1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用方法"><span class="nav-number">2.2.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见问题"><span class="nav-number">2.3.</span> <span class="nav-text">常见问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sky huang</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
