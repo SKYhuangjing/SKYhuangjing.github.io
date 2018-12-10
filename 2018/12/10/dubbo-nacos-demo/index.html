@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在之前的文章中, 有介绍过利用 Zookeeper + Apollo 作为 Dubbo 的注册中心 + 配置中心 =&amp;gt;Zookeeper&amp;amp;Dubbo&amp;amp;Apollo In Docker, 在之前的场景下, 我们需要部署及维护 Zookeeper + Apollo 这两个中间件, 虽然不是很麻烦, 但是这两个中间件毕竟不是阿里出品, 在未来的发展上, 可能与 Dubbo 的结合">
+<meta name="keywords" content="dubbo,nacos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Dubbo 微服务注册配置新选择：Nacos">
+<meta property="og:url" content="https://skyhuangjing.github.io/2018/12/10/dubbo-nacos-demo/index.html">
+<meta property="og:site_name" content="Sky&#39;s Blog">
+<meta property="og:description" content="在之前的文章中, 有介绍过利用 Zookeeper + Apollo 作为 Dubbo 的注册中心 + 配置中心 =&amp;gt;Zookeeper&amp;amp;Dubbo&amp;amp;Apollo In Docker, 在之前的场景下, 我们需要部署及维护 Zookeeper + Apollo 这两个中间件, 虽然不是很麻烦, 但是这两个中间件毕竟不是阿里出品, 在未来的发展上, 可能与 Dubbo 的结合">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/dubbo-nacos-demo/provider.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/dubbo-nacos-demo/provider-detail.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/dubbo-nacos-demo/consumer.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/dubbo-nacos-demo/consumer-detail.jpg">
+<meta property="og:updated_time" content="2018-12-10T07:37:38.809Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Dubbo 微服务注册配置新选择：Nacos">
+<meta name="twitter:description" content="在之前的文章中, 有介绍过利用 Zookeeper + Apollo 作为 Dubbo 的注册中心 + 配置中心 =&amp;gt;Zookeeper&amp;amp;Dubbo&amp;amp;Apollo In Docker, 在之前的场景下, 我们需要部署及维护 Zookeeper + Apollo 这两个中间件, 虽然不是很麻烦, 但是这两个中间件毕竟不是阿里出品, 在未来的发展上, 可能与 Dubbo 的结合">
+<meta name="twitter:image" content="https://skyhuangjing.github.io/images/dubbo-nacos-demo/provider.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://skyhuangjing.github.io/2018/12/10/dubbo-nacos-demo/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Dubbo 微服务注册配置新选择：Nacos | Sky's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sky's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume-cn">
+    <a href="/resumes/resume-cn.html" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card"></i> <br>简历 (中文)</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume-eng">
+    <a href="/resumes/resume-eng.html" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card"></i> <br>简历 (英文)</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skyhuangjing.github.io/2018/12/10/dubbo-nacos-demo/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sky huang">
+      <meta itemprop="description" content="code nothing">
+      <meta itemprop="image" content="/uploads/kenan.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sky's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Apache Dubbo 微服务注册配置新选择：Nacos
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-10 12:18:45 / 修改时间：15:37:38" itemprop="dateCreated datePublished" datetime="2018-12-10T12:18:45+08:00">2018-12-10</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在之前的文章中, 有介绍过利用 Zookeeper + Apollo 作为 Dubbo 的注册中心 + 配置中心 =&gt;<a href="https://skyhuangjing.github.io/2018/09/13/dubbo-apllo-docker/#more">Zookeeper&amp;Dubbo&amp;Apollo In Docker</a>, 在之前的场景下, 我们需要部署及维护 Zookeeper + Apollo 这两个中间件, 虽然不是很麻烦, 但是这两个中间件毕竟不是阿里出品, 在未来的发展上, 可能与 Dubbo 的结合不是会很好, 因此在阿里的开源生态中, 由阿里本身又开源了一个中间件 <a href="https://nacos.io/zh-cn/" target="_blank" rel="noopener"><strong>Nacos</strong></a>  一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。</p>
+<a id="more"></a>
+<h2 id="Nacos-介绍"><a href="#Nacos-介绍" class="headerlink" title="Nacos 介绍"></a>Nacos 介绍</h2><p><a href="https://nacos.io/zh-cn/" target="_blank" rel="noopener"><strong>Nacos</strong></a> 致力于帮助您发现、配置和管理微服务。<a href="https://nacos.io/zh-cn/" target="_blank" rel="noopener"><strong>Nacos</strong></a> 提供了一组简单易用的特性集，帮助您快速实现动态服务发现、服务配置、服务元数据及流量管理。</p>
+<p><a href="https://nacos.io/zh-cn/" target="_blank" rel="noopener"><strong>Nacos</strong></a> 帮助您更敏捷和容易地构建、交付和管理微服务平台。 <a href="https://nacos.io/zh-cn/" target="_blank" rel="noopener"><strong>Nacos</strong></a> 是构建以“服务”为中心的现代应用架构 (例如微服务范式、云原生范式) 的服务基础设施。</p>
+<p><a href="https://nacos.io/zh-cn/" target="_blank" rel="noopener"><strong>Nacos</strong></a> 在其 <a href="https://nacos.io/zh-cn/docs/roadmap.html" target="_blank" rel="noopener"><strong>roadmap</strong></a> 上, 我们可以看到未来 Nacos 将很好的为 Dubbo 提供服务治理的愿景。</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ul>
+<li>Centos 7.5</li>
+<li>Docker 18.06.1-ce</li>
+<li>Docker-compose 1.22.0<blockquote>
+<p>前面有介绍 <a href="https://skyhuangjing.github.io/2018/09/13/dubbo-apllo-docker/#more"><strong>Docker Installation</strong></a> 大家可以参考这篇文章</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="Nacos-安装"><a href="#Nacos-安装" class="headerlink" title="Nacos 安装"></a>Nacos 安装</h2><p>在 [<strong>Nacos</strong>] 开源生态中, 我们找到了其官方提供的 <strong>Dockerfile</strong> 项目 <a href="https://github.com/nacos-group/nacos-docker" target="_blank" rel="noopener"><strong>nacos-docker</strong></a> </p>
+<p>在 <strong>Dokcer Hub</strong> 上 我们可以看到其<a href="https://hub.docker.com/r/nacos/nacos-server/" target="_blank" rel="noopener">官方镜像</a>的最新版本, 笔者现在看到的是 0.6.0 版本</p>
+<p>在其官方项目中, [<strong>Nacos</strong>] 已经提供了多种启动模式, 所以我们在测试时, 无需做多余修改, 直接按照官方文档进行部署即可</p>
+<p>下载其官方 Git 项目<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/nacos-group/nacos-docker.git</span><br><span class="line"><span class="built_in">cd</span> nacos-docker</span><br></pre></td></tr></table></figure></p>
+<p>Stand-alone 启动<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose -f example/standalone.yaml up -d</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>集群模式此处不介绍, 在真正环境配置时, 请使用集群模式</p>
+</blockquote>
+<p>打开 Nacos 控制台<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8848/nacos/</span><br></pre></td></tr></table></figure></p>
+<h2 id="Dubbo-Nacos-集成"><a href="#Dubbo-Nacos-集成" class="headerlink" title="Dubbo Nacos 集成"></a>Dubbo Nacos 集成</h2><p>在 Dubbo PPMC <a href="https://mercyblitz.github.io/about/" target="_blank" rel="noopener">mercyblitz</a> 的推动下, 目前 <a href="https://github.com/mercyblitz/dubbo-registry-nacos" target="_blank" rel="noopener">dubbo-registry-nacos(基于 Dubbo 配置中心 SPI 的 Nacos 实现项目)</a>已经 PR 到 Dubbo 组织下, 等待审核发布.</p>
+<p>在此基础上, <a href="https://mercyblitz.github.io/about/" target="_blank" rel="noopener">mercyblitz</a> 在自己的技术周报直播里, 分享了一期<a href="https://github.com/mercyblitz/tech-weekly/tree/master/2018.12.07%E3%80%8C%E5%B0%8F%E9%A9%AC%E5%93%A5%E6%8A%80%E6%9C%AF%E5%91%A8%E6%8A%A5%E3%80%8D-%20%E7%AC%AC%E5%8D%81%E4%B8%80%E6%9C%9F%E3%80%8AApache%20Dubbo%20%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%B3%BB%E5%88%97%E4%B9%8B%E9%81%87%E8%A7%81%20Nacos%EF%BC%9A%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86%E6%96%B0%E9%B2%9C%E8%B4%A7%20%E3%80%8B" target="_blank" rel="noopener">关于 Dubbo Nacos 集成</a></p>
+<p>因为 <a href="https://mercyblitz.github.io/about/" target="_blank" rel="noopener">mercyblitz</a> 的分享是基于 spring-framework, 所以笔者在基于 <a href="https://github.com/apache/incubator-dubbo-spring-boot-project" target="_blank" rel="noopener">dubbo-spirng-boot-starter</a> 上, 写了一个<a href="https://github.com/SKYhuangjing/dubbo-nacos-demo" target="_blank" rel="noopener">例子</a>, 供大家参考</p>
+<h3 id="Maven-dependency"><a href="#Maven-dependency" class="headerlink" title="Maven dependency"></a>Maven dependency</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>dubbo-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>dubbo<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- Dubbo Nacos registry dependency --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>dubbo-registry-nacos<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.5-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- Spring Context Extras see dubbo-spring-boot-starter readme  --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.spring<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context-support<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.netty<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>netty-all<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.30.Final<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="定义-service-接口"><a href="#定义-service-接口" class="headerlink" title="定义 service 接口"></a>定义 service 接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">sayName</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="提供-service-实现者"><a href="#提供-service-实现者" class="headerlink" title="提供 service 实现者"></a>提供 service 实现者</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(version = <span class="string">"$&#123;demo.service.version&#125;"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultService</span> <span class="keyword">implements</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;demo.service.name&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serviceName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayName</span><span class="params">(String message)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        RpcContext rpcContext = RpcContext.getContext();</span><br><span class="line">        <span class="keyword">return</span> String.format(<span class="string">"Service [name :%s , port : %d] %s(\"%s\") : Hello,%s"</span>,</span><br><span class="line">                serviceName,</span><br><span class="line">                rpcContext.getLocalPort(),</span><br><span class="line">                rpcContext.getMethodName(),</span><br><span class="line">                message,</span><br><span class="line">                message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="service-提供者配置文件"><a href="#service-提供者配置文件" class="headerlink" title="service 提供者配置文件"></a>service 提供者配置文件</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## Dubbo Application info</span></span><br><span class="line"><span class="string">dubbo.application.id=dubbo-provider-demo</span></span><br><span class="line"><span class="string">dubbo.application.name=dubbo-provider-demo</span></span><br><span class="line"><span class="comment">## Nacos registry address</span></span><br><span class="line"><span class="string">dubbo.registry.id=my-nacos</span></span><br><span class="line"><span class="string">dubbo.registry.address=nacos://127.0.0.1:8848</span></span><br><span class="line"><span class="comment">## Dubbo Protocol using random port</span></span><br><span class="line"><span class="string">dubbo.protocol.name=dubbo</span></span><br><span class="line"><span class="string">dubbo.protocol.port=-1</span></span><br><span class="line"><span class="comment"># Provider @Service info</span></span><br><span class="line"><span class="string">demo.service.version=1.0.0</span></span><br><span class="line"><span class="string">demo.service.name=demoService</span></span><br><span class="line"></span><br><span class="line"><span class="string">dubbo.scan.basePackages</span>  <span class="string">=</span> <span class="string">com.sky.dubbo.nacos.demo.service</span></span><br></pre></td></tr></table></figure>
+<h3 id="启动-service-提供者"><a href="#启动-service-提供者" class="headerlink" title="启动 service 提供者"></a>启动 service 提供者</h3><blockquote>
+<p>此注解使用写法仅为测试<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableAutoConfiguration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DubboNacosDemoApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        Properties prop = <span class="keyword">new</span> Properties();</span><br><span class="line">        URL url = ApplicationRunner.class.getClassLoader().getResource(<span class="string">"provider.properties"</span>);</span><br><span class="line">        prop.load(url.openStream());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> SpringApplicationBuilder(DubboNacosDemoApplication.class)</span><br><span class="line">                .web(WebApplicationType.NONE).properties(prop).run(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>可开启多个service 提供者, idea 上修改启动配置, 允许并行启动 allow running in parallel, 此处开启了三个服务提供者</p>
+</blockquote>
+<p> <img src="/images/dubbo-nacos-demo/provider.jpg" alt=""></p>
+<p> <img src="/images/dubbo-nacos-demo/provider-detail.jpg" alt=""></p>
+<h3 id="service-消费者配置文件"><a href="#service-消费者配置文件" class="headerlink" title="service 消费者配置文件"></a>service 消费者配置文件</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## Dubbo Application info</span></span><br><span class="line"><span class="string">dubbo.application.name</span> <span class="string">=</span> <span class="string">dubbo-consumer-demo</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## Nacos registry address</span></span><br><span class="line"><span class="string">dubbo.registry.address</span> <span class="string">=</span> <span class="attr">nacos://127.0.0.1:8848</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># @Reference version</span></span><br><span class="line"><span class="string">demo.service.version=</span> <span class="number">1.0</span><span class="number">.0</span></span><br></pre></td></tr></table></figure>
+<h3 id="启动-service-消费者"><a href="#启动-service-消费者" class="headerlink" title="启动 service 消费者"></a>启动 service 消费者</h3><blockquote>
+<p>此注解使用写法仅为测试<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableAutoConfiguration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DubboNacosDemoConsumerApplication</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Reference</span>(version = <span class="string">"$&#123;demo.service.version&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> DemoService demoService;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            System.out.println(demoService.sayName(<span class="string">"Mercy"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Properties prop = <span class="keyword">new</span> Properties();</span><br><span class="line">        URL url = ApplicationRunner.class.getClassLoader().getResource(<span class="string">"consumer.properties"</span>);</span><br><span class="line">        prop.load(url.openStream());</span><br><span class="line">        SpringApplication app = <span class="keyword">new</span> SpringApplication(DubboNacosDemoConsumerApplication.class);</span><br><span class="line">        app.setDefaultProperties(prop);</span><br><span class="line">        app.run(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>消费者启动打印的输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Service [name :demoService , port : 20881] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20880] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20882] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20881] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20882] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20881] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20880] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20882] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20880] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br><span class="line">Service [name :demoService , port : 20882] sayName(&quot;Mercy&quot;) : Hello,Mercy</span><br></pre></td></tr></table></figure></p>
+<p> <img src="/images/dubbo-nacos-demo/consumer.jpg" alt=""></p>
+<p> <img src="/images/dubbo-nacos-demo/consumer-detail.jpg" alt=""></p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h3 id="如果启动时报错-ClassNotFound-com-alibaba-spring-util-PropertySourcesUtils"><a href="#如果启动时报错-ClassNotFound-com-alibaba-spring-util-PropertySourcesUtils" class="headerlink" title="如果启动时报错 ClassNotFound : com.alibaba.spring.util.PropertySourcesUtils"></a>如果启动时报错 ClassNotFound : com.alibaba.spring.util.PropertySourcesUtils</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Caused by: java.lang.ClassNotFoundException: com.alibaba.spring.util.PropertySourcesUtils</span><br><span class="line">	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[na:1.8.0_161]</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[na:1.8.0_161]</span><br><span class="line">	at sun.misc.Launcher<span class="variable">$AppClassLoader</span>.loadClass(Launcher.java:338) ~[na:1.8.0_161]</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[na:1.8.0_161]</span><br></pre></td></tr></table></figure>
+<p>请加入 spring-context-support, 可查看<a href="https://github.com/apache/incubator-dubbo-spring-boot-project" target="_blank" rel="noopener">dubbo-spirng-boot-starter</a> 官方推荐的依赖<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.spring<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context-support<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="如果启动时报错-ClassNotFound-io-netty-channel-nio-NioEventLoopGroup"><a href="#如果启动时报错-ClassNotFound-io-netty-channel-nio-NioEventLoopGroup" class="headerlink" title="如果启动时报错 ClassNotFound : io.netty.channel.nio.NioEventLoopGroup"></a>如果启动时报错 ClassNotFound : io.netty.channel.nio.NioEventLoopGroup</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Caused by: java.lang.ClassNotFoundException: io.netty.channel.nio.NioEventLoopGroup</span><br><span class="line">	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[na:1.8.0_161]</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[na:1.8.0_161]</span><br><span class="line">	at sun.misc.Launcher<span class="variable">$AppClassLoader</span>.loadClass(Launcher.java:338) ~[na:1.8.0_161]</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[na:1.8.0_161]</span><br></pre></td></tr></table></figure>
+<p>请加入 netty-all<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.netty<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>netty-all<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.30.Final<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dubbo/" rel="tag"># dubbo</a>
+          
+            <a href="/tags/nacos/" rel="tag"># nacos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/16/sonarQube-quickstart/" rel="next" title="SonarQube QuickStart">
+                <i class="fa fa-chevron-left"></i> SonarQube QuickStart
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/kenan.jpg" alt="Sky huang">
+            
+              <p class="site-author-name" itemprop="name">Sky huang</p>
+              <p class="site-description motion-element" itemprop="description">code nothing</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/SKYhuangjing" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:sky_1994@outlook.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos-介绍"><span class="nav-number">1.</span> <span class="nav-text">Nacos 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境准备"><span class="nav-number">2.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos-安装"><span class="nav-number">3.</span> <span class="nav-text">Nacos 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dubbo-Nacos-集成"><span class="nav-number">4.</span> <span class="nav-text">Dubbo Nacos 集成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Maven-dependency"><span class="nav-number">4.1.</span> <span class="nav-text">Maven dependency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-service-接口"><span class="nav-number">4.2.</span> <span class="nav-text">定义 service 接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提供-service-实现者"><span class="nav-number">4.3.</span> <span class="nav-text">提供 service 实现者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service-提供者配置文件"><span class="nav-number">4.4.</span> <span class="nav-text">service 提供者配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-service-提供者"><span class="nav-number">4.5.</span> <span class="nav-text">启动 service 提供者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service-消费者配置文件"><span class="nav-number">4.6.</span> <span class="nav-text">service 消费者配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-service-消费者"><span class="nav-number">4.7.</span> <span class="nav-text">启动 service 消费者</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如果启动时报错-ClassNotFound-com-alibaba-spring-util-PropertySourcesUtils"><span class="nav-number">5.1.</span> <span class="nav-text">如果启动时报错 ClassNotFound : com.alibaba.spring.util.PropertySourcesUtils</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如果启动时报错-ClassNotFound-io-netty-channel-nio-NioEventLoopGroup"><span class="nav-number">5.2.</span> <span class="nav-text">如果启动时报错 ClassNotFound : io.netty.channel.nio.NioEventLoopGroup</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sky huang</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
