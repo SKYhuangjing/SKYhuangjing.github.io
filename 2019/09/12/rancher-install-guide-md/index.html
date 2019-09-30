@@ -108,25 +108,28 @@
 
 
 
-  <meta name="description" content="前段时间在网上找开源的blog系统,最终发现了 Hexo, 觉得它简单明了,适合技术人的风格,利用 Hexo, 我做了一个自己的爱情纪念地, 最近开始想坚持写文章, 提升自己的技术能力,也是对自己知识的一种归纳, 所以第一篇文章献给 Hexo 咯~~">
-<meta name="keywords" content="hexo,Pages">
+  <meta name="description" content="在容器的江湖里，如果你没听过 k8s， 那可能你就 out 了，但原生的 k8s 对于程序员来说，是有一定门槛的。本文介绍的 Rancher  则作为一款完全开源的容器管理平台，它极大的降低了我们的使用门槛，那么本文将围绕 安装 + 使用 两个方面作一个入门介绍。">
+<meta name="keywords" content="Docker,k8s">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用Hexo构建自己的Blog">
-<meta property="og:url" content="https://skyhuangjing.github.io/2018/09/14/hexo-github/index.html">
+<meta property="og:title" content="Rancher Installation Guide">
+<meta property="og:url" content="https://skyhuangjing.github.io/2019/09/12/rancher-install-guide-md/index.html">
 <meta property="og:site_name" content="Sky&#39;s Blog">
-<meta property="og:description" content="前段时间在网上找开源的blog系统,最终发现了 Hexo, 觉得它简单明了,适合技术人的风格,利用 Hexo, 我做了一个自己的爱情纪念地, 最近开始想坚持写文章, 提升自己的技术能力,也是对自己知识的一种归纳, 所以第一篇文章献给 Hexo 咯~~">
+<meta property="og:description" content="在容器的江湖里，如果你没听过 k8s， 那可能你就 out 了，但原生的 k8s 对于程序员来说，是有一定门槛的。本文介绍的 Rancher  则作为一款完全开源的容器管理平台，它极大的降低了我们的使用门槛，那么本文将围绕 安装 + 使用 两个方面作一个入门介绍。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-31T08:22:19.631Z">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/rancher-install-guide/rancher-k8s-node.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/rancher-install-guide/rancher-webhooks-conf.jpg">
+<meta property="og:updated_time" content="2019-09-30T03:25:20.504Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用Hexo构建自己的Blog">
-<meta name="twitter:description" content="前段时间在网上找开源的blog系统,最终发现了 Hexo, 觉得它简单明了,适合技术人的风格,利用 Hexo, 我做了一个自己的爱情纪念地, 最近开始想坚持写文章, 提升自己的技术能力,也是对自己知识的一种归纳, 所以第一篇文章献给 Hexo 咯~~">
+<meta name="twitter:title" content="Rancher Installation Guide">
+<meta name="twitter:description" content="在容器的江湖里，如果你没听过 k8s， 那可能你就 out 了，但原生的 k8s 对于程序员来说，是有一定门槛的。本文介绍的 Rancher  则作为一款完全开源的容器管理平台，它极大的降低了我们的使用门槛，那么本文将围绕 安装 + 使用 两个方面作一个入门介绍。">
+<meta name="twitter:image" content="https://skyhuangjing.github.io/images/rancher-install-guide/rancher-k8s-node.jpg">
 
 
 
 
 
 
-  <link rel="canonical" href="https://skyhuangjing.github.io/2018/09/14/hexo-github/">
+  <link rel="canonical" href="https://skyhuangjing.github.io/2019/09/12/rancher-install-guide-md/">
 
 
 
@@ -136,7 +139,7 @@
   };
 </script>
 
-  <title>使用Hexo构建自己的Blog | Sky's Blog</title>
+  <title>Rancher Installation Guide | Sky's Blog</title>
   
 
 
@@ -305,7 +308,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://skyhuangjing.github.io/2018/09/14/hexo-github/">
+    <link itemprop="mainEntityOfPage" href="https://skyhuangjing.github.io/2019/09/12/rancher-install-guide-md/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Sky huang">
@@ -322,7 +325,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">使用Hexo构建自己的Blog
+          <h1 class="post-title" itemprop="name headline">Rancher Installation Guide
               
             
           </h1>
@@ -347,7 +350,7 @@
                 
               
 
-              <time title="创建时间：2018-09-14 11:00:47" itemprop="dateCreated datePublished" datetime="2018-09-14T11:00:47+08:00">2018-09-14</time>
+              <time title="创建时间：2019-09-12 16:53:40" itemprop="dateCreated datePublished" datetime="2019-09-12T16:53:40+08:00">2019-09-12</time>
             
 
             
@@ -364,7 +367,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-10-31 16:22:19" itemprop="dateModified" datetime="2018-10-31T16:22:19+08:00">2018-10-31</time>
+                <time title="修改时间：2019-09-30 11:25:20" itemprop="dateModified" datetime="2019-09-30T11:25:20+08:00">2019-09-30</time>
               
             
           </span>
@@ -397,20 +400,51 @@
       
 
       
-        <p>前段时间在网上找开源的blog系统,最终发现了 <a href="https://hexo.io/zh-cn/" target="_blank" rel="noopener">Hexo</a>, 觉得它简单明了,适合技术人的风格,利用 <a href="https://hexo.io/zh-cn/" target="_blank" rel="noopener">Hexo</a>, 我做了一个自己的<a href="http://sky4maggie.com/story/" target="_blank" rel="noopener">爱情纪念地</a>, 最近开始想坚持写文章, 提升自己的技术能力,也是对自己知识的一种归纳, 所以第一篇文章献给 <a href="https://hexo.io/zh-cn/" target="_blank" rel="noopener">Hexo</a> 咯~~<br><a id="more"></a></p>
-<h2 id="hexo-github-Online-Blog"><a href="#hexo-github-Online-Blog" class="headerlink" title="hexo + github = Online Blog"></a>hexo + github = Online Blog</h2><h3 id="Github-Pages"><a href="#Github-Pages" class="headerlink" title="Github Pages"></a>Github Pages</h3><p><a href="https://pages.github.com/" target="_blank" rel="noopener">Github Pages</a> 是由提供github提供的个人/组织免费站点, 可以使用 Github 默认提供的二级域名进行访问</p>
-<p><a href="https://pages.github.com/" target="_blank" rel="noopener">Github Pages</a> 创建非常简单, 在 Github 上创建一个仓库, 其仓库名称一定是 your-github-username.github.io, 否则解析不成功, 创建成功后, 先可按照 Github 提示初始化仓库,或者先本地安装好 <a href="https://hexo.io/zh-cn/" target="_blank" rel="noopener">Hexo</a> 再利用 <a href="https://hexo.io/zh-cn/docs/deployment" target="_blank" rel="noopener">Hexo Git</a> 插件做部署发布, 此文做法是先初始化了仓库, 再做插件部署</p>
-<h3 id="Hexo-安装"><a href="#Hexo-安装" class="headerlink" title="Hexo 安装"></a>Hexo 安装</h3><p>官网提供的<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="noopener">安装文档</a>非常详细, 在此就不复述了 </p>
-<h3 id="集成Git发布"><a href="#集成Git发布" class="headerlink" title="集成Git发布"></a>集成Git发布</h3><p>Hexo Git 插件<a href="https://hexo.io/zh-cn/docs/deployment#Git" target="_blank" rel="noopener">安装文档</a></p>
-<p>在修改配置时, 记住文档中提供的 message 不要这样写, 要么不写, 要么自己再定义, 不然你会掉坑的<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repo:</span> <span class="string">&lt;repository</span> <span class="string">url&gt;</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">[branch]</span></span><br><span class="line"><span class="attr">  message:</span> <span class="string">[message]</span></span><br></pre></td></tr></table></figure></p>
-<p>配置 Git 部署,还需要本地可以通过ssh连接上 GitHub </p>
-<p>确保本地 git 全局配置的 user.name和user.email 是你的 GitHub 账户,若不是,请先更新 user.name和user.email 配置信息<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">"你的GitHub用户名"</span></span><br><span class="line">git config --global user.email <span class="string">"你的GitHub注册邮箱"</span></span><br></pre></td></tr></table></figure></p>
-<p>生成ssh密钥文件<br>(如果已经有其他的 id_rsa ,请重新命名此处新创建的 id_rsa)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">"你的GitHub注册邮箱"</span> -b 4096</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/Users/sky/.ssh/id_rsa): github_id_rsa</span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):</span><br><span class="line">Enter same passphrase again:</span><br><span class="line">Your identification has been saved <span class="keyword">in</span> github_id_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> github_id_rsa.pub.</span><br></pre></td></tr></table></figure></p>
-<p> 如果没有使用默认的 id_rsa 名称,则需要执行( Mac OS 有一个坑是重启电脑后, 此命令得重新执行, 这个坑后续文章介绍)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-add github_id_rsa</span><br></pre></td></tr></table></figure></p>
-<p>将生成的 github_id_rsa.pub的文件内容复制, 放入 <a href="https://github.com/settings/ssh/new" target="_blank" rel="noopener">GitHub ssh key</a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat github_id_rsa.pub</span><br></pre></td></tr></table></figure></p>
-<p>检测 GitHub 公钥设置是否成功，输入 (记住一定要设置 user.name和user.email, 还有 ssh-add, 否则可能一直会报错)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh git@github.com</span><br><span class="line">PTY allocation request failed on channel 0</span><br><span class="line">Hi 你的GitHub用户名! You<span class="string">'ve successfully authenticated, but GitHub does not provide shell access.</span></span><br><span class="line"><span class="string">Connection to github.com closed.</span></span><br></pre></td></tr></table></figure></p>
-<p>好了, 可以开始测试发布啦<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> your-hexo-root-path</span><br><span class="line">hexo clean&amp;&amp;hexo g -d</span><br></pre></td></tr></table></figure></p>
-<p>请查看你的  <a href="https://your-github-username.github.io" target="_blank" rel="noopener">Online Blog</a> 吧.</p>
+        <p>在容器的江湖里，如果你没听过 <strong>k8s</strong>， 那可能你就 out 了，但原生的 <strong>k8s</strong> 对于程序员来说，是有一定门槛的。本文介绍的 <a href="https://www.rancher.cn/docs/rancher/v2.x/cn/overview/" target="_blank" rel="noopener"><strong>Rancher</strong></a>  则作为一款完全开源的容器管理平台，它极大的降低了我们的使用门槛，那么本文将围绕 安装 + 使用 两个方面作一个入门介绍。</p>
+<a id="more"></a>
+<h2 id="Rancher-介绍"><a href="#Rancher-介绍" class="headerlink" title="Rancher 介绍"></a>Rancher 介绍</h2><p><a href="https://www.rancher.cn/docs/rancher/v2.x/cn/overview/" target="_blank" rel="noopener"><strong>Rancher</strong></a> 是一套容器管理平台，它可以帮助组织在生产环境中轻松快捷的部署和管理容器。 <a href="https://www.rancher.cn/docs/rancher/v2.x/cn/overview/" target="_blank" rel="noopener"><strong>Rancher</strong></a> 可以轻松地管理各种环境的 Kubernetes，满足IT需求并为 DevOps 团队提供支持。</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>最好的情况是有三台的服务器, 这样能看到集群的效果</p>
+<h3 id="安装-Docker"><a href="#安装-Docker" class="headerlink" title="安装 Docker"></a>安装 Docker</h3><p>前面有介绍 <a href="https://skyhuangjing.github.io/2018/09/13/dubbo-apllo-docker/#more"><strong>Docker Installation</strong></a> 这里就不再赘述了</p>
+<h3 id="安装-Kubectl"><a href="#安装-Kubectl" class="headerlink" title="安装 Kubectl"></a>安装 Kubectl</h3><p>这里有官方的<a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux" target="_blank" rel="noopener">安装文档</a>, 但需要翻墙, 国内用户可以找下其他方式</p>
+<h2 id="Rancher-安装"><a href="#Rancher-安装" class="headerlink" title="Rancher 安装"></a>Rancher 安装</h2><p><a href="https://www.rancher.cn/docs/rancher/v2.x/cn/installation/single-node-install/" target="_blank" rel="noopener">官方文档</a></p>
+<p>选择一台机器来安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --restart=unless-stopped \</span><br><span class="line">-p 8282:80 -p 8443:443 \</span><br><span class="line">-v /home/rancher/data:/var/lib/rancher/ \</span><br><span class="line">-v /home/rancher/log/auditlog:/var/log/auditlog \</span><br><span class="line">-e AUDIT_LEVEL=3 \</span><br><span class="line">rancher/rancher:stable</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>请按照自己的实际要求, 映射端口和数据卷</p>
+</blockquote>
+<h2 id="Rancher-配置"><a href="#Rancher-配置" class="headerlink" title="Rancher 配置"></a>Rancher 配置</h2><p><a href="https://www.rancher.cn/docs/rancher/v2.x/cn/overview/quick-start-guide/" target="_blank" rel="noopener">官方文档</a></p>
+<p>访问上一步选择安装的服务器 IP:8282</p>
+<p>第一次打开, 会要求设置管理员密码</p>
+<p>要求设置 Rancher Server URL, 这里要保证其他的 Rancher Agent 机器能够访问到</p>
+<h2 id="创建-K8s-集群"><a href="#创建-K8s-集群" class="headerlink" title="创建 K8s 集群"></a>创建 K8s 集群</h2><p><a href="https://www.rancher.cn/docs/rancher/v2.x/cn/overview/quick-start-guide/#%E4%BA%94-%E5%88%9B%E5%BB%BAk8s%E9%9B%86%E7%BE%A4" target="_blank" rel="noopener">官方文档</a></p>
+<p>注意: </p>
+<ul>
+<li>在集群注册后, 要耐心等待一段时间(比较长, 笔者预计10min), 这个期间集群节点的状态会出现很多异常, 最终会显示 <strong>Active</strong> 状态.</li>
+</ul>
+<p><img src="/images/rancher-install-guide/rancher-k8s-node.jpg" alt="Rancher k8s Node" title="Rancher k8s Node"></p>
+<h2 id="安装-Webhooks"><a href="#安装-Webhooks" class="headerlink" title="安装 Webhooks"></a>安装 Webhooks</h2><p><a href="https://www.rancher.cn/docs/rancher/v2.x/cn/configuration/webhooks/" target="_blank" rel="noopener">官方文档</a></p>
+<p>注意: </p>
+<ul>
+<li>邮件的配置可以忽略</li>
+<li>webhook_url 为 webhooks 对外服务的IP:Port</li>
+<li>Jenkins 请使用 自定义webhooks 格式, 提交的 json 中 repository.namespace 为 harbor 项目</li>
+<li>webhooks-conf 的json 配置实际上是一个表达式的验证, Webhooks 中的参数与配置的对应, 即可触发<ul>
+<li><strong>APP_NS</strong> 对应的 Rancher 的命名空间</li>
+<li><strong>APP_WORKLOAD</strong> 对应的是 部署类型</li>
+<li><strong>APP_CONTAINER</strong> 对应的是 容器名称</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/rancher-install-guide/rancher-webhooks-conf.jpg" alt="Rancher webhooks Conf" title="Rancher webhooks Conf"></p>
+<h2 id="使用心得"><a href="#使用心得" class="headerlink" title="使用心得"></a>使用心得</h2><ul>
+<li>在传统的 docker-compose 中, 如果我们依赖某个服务, 一般会使用 <strong>link</strong>, 例如 app 依赖 db, 那么在 rancher 中我们可以将数据库服务命名为 db, app 与 db 在同一个命名空间里的话, 会自动解析 db, 应用内部可以直接使用 db</li>
+<li>自动化部署集成思路<ul>
+<li>Gitlab : Commit 触发 Jenkins Webhooks</li>
+<li>Jenkins : 自动编译及打包镜像 推送到 Harbor, 触发 Rancher Webhooks</li>
+<li>Harbor : 存储及分发镜像</li>
+<li>Rancher : 部署 APP 集群, 接收 Webhooks 自动升级镜像</li>
+</ul>
+</li>
+</ul>
 
       
     </div>
@@ -431,9 +465,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag"># hexo</a>
+            <a href="/tags/Docker/" rel="tag"># Docker</a>
           
-            <a href="/tags/Pages/" rel="tag"># Pages</a>
+            <a href="/tags/k8s/" rel="tag"># k8s</a>
           
         </div>
       
@@ -446,8 +480,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/13/dubbo-apllo-docker/" rel="next" title="Zookeeper&Dubbo&Apollo In Docker">
-                <i class="fa fa-chevron-left"></i> Zookeeper&Dubbo&Apollo In Docker
+              <a href="/2018/12/10/dubbo-nacos-demo/" rel="next" title="Apache Dubbo 微服务注册配置新选择：Nacos">
+                <i class="fa fa-chevron-left"></i> Apache Dubbo 微服务注册配置新选择：Nacos
               </a>
             
           </div>
@@ -456,8 +490,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/09/29/jfinal-dubbo/" rel="prev" title="JFinal与Dubbo集成(无Spring)">
-                JFinal与Dubbo集成(无Spring) <i class="fa fa-chevron-right"></i>
+              <a href="/2019/09/12/2co-quickstart/" rel="prev" title="2Checkout Integration">
+                2Checkout Integration <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -627,7 +661,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-github-Online-Blog"><span class="nav-number">1.</span> <span class="nav-text">hexo + github = Online Blog</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Github-Pages"><span class="nav-number">1.1.</span> <span class="nav-text">Github Pages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hexo-安装"><span class="nav-number">1.2.</span> <span class="nav-text">Hexo 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集成Git发布"><span class="nav-number">1.3.</span> <span class="nav-text">集成Git发布</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Rancher-介绍"><span class="nav-number">1.</span> <span class="nav-text">Rancher 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境准备"><span class="nav-number">2.</span> <span class="nav-text">环境准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Docker"><span class="nav-number">2.1.</span> <span class="nav-text">安装 Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Kubectl"><span class="nav-number">2.2.</span> <span class="nav-text">安装 Kubectl</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rancher-安装"><span class="nav-number">3.</span> <span class="nav-text">Rancher 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rancher-配置"><span class="nav-number">4.</span> <span class="nav-text">Rancher 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-K8s-集群"><span class="nav-number">5.</span> <span class="nav-text">创建 K8s 集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-Webhooks"><span class="nav-number">6.</span> <span class="nav-text">安装 Webhooks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用心得"><span class="nav-number">7.</span> <span class="nav-text">使用心得</span></a></li></ol></div>
             
 
           </div>

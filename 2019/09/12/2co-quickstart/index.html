@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="2Checkout 是国外一家做信用卡支付的公司，其主要做系统的解决方案，也提供了 API 的集成，本文将主要介绍 2Checkout 的 API 集成方案。">
+<meta name="keywords" content="Checkout(支付)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2Checkout Integration">
+<meta property="og:url" content="https://skyhuangjing.github.io/2019/09/12/2co-quickstart/index.html">
+<meta property="og:site_name" content="Sky&#39;s Blog">
+<meta property="og:description" content="2Checkout 是国外一家做信用卡支付的公司，其主要做系统的解决方案，也提供了 API 的集成，本文将主要介绍 2Checkout 的 API 集成方案。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/2co-quickstart/2co-cart1.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/2co-quickstart/2co-cart2.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/2co-quickstart/2co-ipn.jpg">
+<meta property="og:image" content="https://skyhuangjing.github.io/images/2co-quickstart/2co-ins.jpg">
+<meta property="og:updated_time" content="2019-09-30T05:08:27.927Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2Checkout Integration">
+<meta name="twitter:description" content="2Checkout 是国外一家做信用卡支付的公司，其主要做系统的解决方案，也提供了 API 的集成，本文将主要介绍 2Checkout 的 API 集成方案。">
+<meta name="twitter:image" content="https://skyhuangjing.github.io/images/2co-quickstart/2co-cart1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://skyhuangjing.github.io/2019/09/12/2co-quickstart/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>2Checkout Integration | Sky's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sky's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume-cn">
+    <a href="/resumes/resume-cn.html" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card"></i> <br>简历 (中文)</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume-eng">
+    <a href="/resumes/resume-eng.html" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card"></i> <br>简历 (英文)</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skyhuangjing.github.io/2019/09/12/2co-quickstart/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sky huang">
+      <meta itemprop="description" content="code nothing">
+      <meta itemprop="image" content="/uploads/kenan.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sky's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2Checkout Integration
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-12 17:00:10" itemprop="dateCreated datePublished" datetime="2019-09-12T17:00:10+08:00">2019-09-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-30 13:08:27" itemprop="dateModified" datetime="2019-09-30T13:08:27+08:00">2019-09-30</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://knowledgecenter.2checkout.com/API-Integration" target="_blank" rel="noopener"><strong>2Checkout</strong></a> 是国外一家做信用卡支付的公司，其主要做系统的解决方案，也提供了 <strong>API</strong> 的集成，本文将主要介绍 <a href="https://knowledgecenter.2checkout.com/API-Integration" target="_blank" rel="noopener"><strong>2Checkout</strong></a> 的 <strong>API</strong> 集成方案。</p>
+<a id="more"></a>
+<h2 id="定位"><a href="#定位" class="headerlink" title="定位"></a>定位</h2><p>之前我们有讲到 <strong><a href="https://skyhuangjing.github.io/2018/11/15/stripe-quickstart/#more">Stripe</a></strong> 也是国外一家做信用卡支付的公司, 那么两者之间和国外其他两家做支付的区别在哪呢</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>PayPal</th>
+<th>PayDollar</th>
+<th>2Checkout</th>
+<th>Stripe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定位</td>
+<td>自有支付平台</td>
+<td>融合支付平台</td>
+<td>信用卡支付平台</td>
+<td>信用卡支付平台</td>
+</tr>
+<tr>
+<td>集成方案</td>
+<td><a href="https://developer.paypal.com/developer/dashboard/sandbox/" target="_blank" rel="noopener">PayPal</a></td>
+<td><a href="http://www.paydollar.com/pdf/op/enpdintguide.pdf" target="_blank" rel="noopener">PayDollar</a></td>
+<td><a href="https://knowledgecenter.2checkout.com/API-Integration/REST_5.0_Reference#/reference/orders-with-dynamic-products/use-credit-cards" target="_blank" rel="noopener">2Checkout</a></td>
+<td><a href="https://stripe.com/docs/web" target="_blank" rel="noopener">Stripe</a></td>
+</tr>
+<tr>
+<td>优点</td>
+<td>类支付宝</td>
+<td>可以对接一些第三方支付服务,支付宝/银联/微信</td>
+<td>安全性高适用于国外信用卡</td>
+<td>文档全</td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>类支付宝</td>
+<td>受政策和商务影响较多</td>
+<td>不支持国内信用卡</td>
+<td>安全性查, 无法防止盗刷</td>
+</tr>
+</tbody>
+</table>
+<h2 id="集成方案"><a href="#集成方案" class="headerlink" title="集成方案"></a>集成方案</h2><p>2Checkout 集成方案可以分为两种</p>
+<ul>
+<li>一站式集成, 调用 2Checkout 支付界面完成支付, 通知我们<ul>
+<li>优点 : 简单, 快捷</li>
+<li>缺点 : 无法获取用户的支付信息, 无法定制化支付界面</li>
+</ul>
+</li>
+<li>API 式集成, 前端收集支付信息, 由后端调用 2Checkout Rest API 完成支付, 通知我们<ul>
+<li>优点 : 灵活, 可定制化前端支付界面以及获取用户信息</li>
+<li>缺点 : 需要对支付环节进行二次开发, 较复杂</li>
+</ul>
+</li>
+</ul>
+<p>接下来, 我们都说说这两种是怎么集成的</p>
+<h3 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h3><p>首先 请确认你已经有了 2Checkout 的账号</p>
+<h3 id="一站式集成"><a href="#一站式集成" class="headerlink" title="一站式集成"></a>一站式集成</h3><p><a href="https://knowledgecenter.2checkout.com/Onboarding/2Checkout-Upgrade-Process/Inline-Checkout" target="_blank" rel="noopener">Inline Checkout Guide</a></p>
+<h4 id="前端集成"><a href="#前端集成" class="headerlink" title="前端集成"></a>前端集成</h4><p><a href="https://knowledgecenter.2checkout.com/Onboarding/2Checkout-Upgrade-Process/Inline-Checkout/Advanced_Inline_Checkout_experience" target="_blank" rel="noopener">Inline Checkout JS 参数</a></p>
+<p>在前端引入 2Checkout JS 时, 注意 如果我们不使用 2Checkout 的产品概念, 请设置 app.mode 为 DYNAMIC</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">  (<span class="function"><span class="keyword">function</span> (<span class="params">document, src, libName, config</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> script             = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>);</span><br><span class="line">      script.src             = src;</span><br><span class="line">      script.async           = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">var</span> firstScriptElement = <span class="built_in">document</span>.getElementsByTagName(<span class="string">'script'</span>)[<span class="number">0</span>];</span><br><span class="line">      script.onload          = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="keyword">for</span> (<span class="keyword">var</span> namespace <span class="keyword">in</span> config) &#123;</span><br><span class="line">              <span class="keyword">if</span> (config.hasOwnProperty(namespace)) &#123;</span><br><span class="line">                  <span class="built_in">window</span>[libName].setup.setConfig(namespace, config[namespace]);</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="built_in">window</span>[libName].register();</span><br><span class="line">      &#125;;</span><br><span class="line"> </span><br><span class="line">      firstScriptElement.parentNode.insertBefore(script, firstScriptElement);</span><br><span class="line">  &#125;)(<span class="built_in">document</span>, <span class="string">'https://secure.avangate.com/checkout/client/twoCoInlineCart.js'</span>, <span class="string">'TwoCoInlineCart'</span>,&#123;<span class="string">"app"</span>:&#123;<span class="string">"merchant"</span>:<span class="string">"XXXXXXX"</span>,<span class="string">"mode"</span>:<span class="string">"DYNAMIC"</span>&#125;,<span class="string">"cart"</span>:&#123;<span class="string">"host"</span>:<span class="string">"https:\/\/secure.2checkout.com"</span>,<span class="string">"customization"</span>:<span class="string">"inline"</span>&#125;&#125;);</span><br></pre></td></tr></table></figure>
+<p>在实际发起支付的地方, 我们用以下代码唤起支付页面, 而且 2Checkout 提供了事件, 供我们处理前端的跳转, 因此, 我们无需与后台通讯, 即可获取支付状态等.<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">TwoCoInlineCart.cart.reloadCart();</span><br><span class="line"><span class="comment">// 注册购物车关闭的事件</span></span><br><span class="line">TwoCoInlineCart.events.subscribe(<span class="string">'cart:closed'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'cart:closed triggered'</span>);</span><br><span class="line">  <span class="comment">// debugger;</span></span><br><span class="line">  <span class="keyword">this</span>.$emit(<span class="string">'closeLoading'</span>)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册支付完成的事件</span></span><br><span class="line">TwoCoInlineCart.events.subscribe(<span class="string">'payment:finalized'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'payment:finalized triggered'</span>);</span><br><span class="line">  <span class="comment">// debugger;</span></span><br><span class="line">  <span class="keyword">this</span>.$router.push(<span class="keyword">this</span>.payData.successUrl);</span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line">TwoCoInlineCart.products.removeAll();</span><br><span class="line"><span class="comment">// 设置 购买的产品</span></span><br><span class="line">TwoCoInlineCart.products.add(&#123;</span><br><span class="line">  type: <span class="string">"PRODUCT"</span>,</span><br><span class="line">  name: <span class="string">"Product Name"</span>,</span><br><span class="line">  price: <span class="keyword">this</span>.payData.amount,</span><br><span class="line">  tangible: <span class="string">"FALSE"</span></span><br><span class="line">&#125;); <span class="comment">// add products to cart</span></span><br><span class="line"><span class="keyword">if</span> (localStorage.getItem(<span class="string">"lang"</span>) == <span class="string">"zh-CN"</span>) &#123;</span><br><span class="line">  TwoCoInlineCart.cart.setLanguage(<span class="string">"ZH"</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  TwoCoInlineCart.cart.setLanguage(<span class="string">"EN"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 设置 购买的邮箱</span></span><br><span class="line"><span class="comment">//TwoCoInlineCart.billing.setEmail(localStorage.getItem("login_mail"));</span></span><br><span class="line"><span class="comment">// 设置 购买的用户名</span></span><br><span class="line"><span class="comment">//TwoCoInlineCart.billing.setName(localStorage.getItem("login_name"));</span></span><br><span class="line"><span class="comment">// 设置 返回的方法</span></span><br><span class="line">TwoCoInlineCart.cart.setReturnMethod(<span class="keyword">this</span>.payData.successUrl);</span><br><span class="line"><span class="comment">// 设置 购物车的币种</span></span><br><span class="line">TwoCoInlineCart.cart.setCurrency(<span class="string">'USD'</span>);</span><br><span class="line"><span class="comment">// 设置 是否为测试订单</span></span><br><span class="line">TwoCoInlineCart.cart.setTest(!isProdENV());</span><br><span class="line"><span class="comment">// 设置 自己业务的订单</span></span><br><span class="line">TwoCoInlineCart.cart.setOrderExternalRef(<span class="keyword">this</span>.payData.orderRef);</span><br><span class="line"><span class="comment">// 设置 自己业务的数据</span></span><br><span class="line">TwoCoInlineCart.cart.setExternalCustomerReference(<span class="keyword">this</span>.payData.remark);</span><br><span class="line">TwoCoInlineCart.cart.setCartLockedFlag(<span class="literal">true</span>);</span><br><span class="line"><span class="comment">// 唤起购物车界面</span></span><br><span class="line">TwoCoInlineCart.cart.checkout();</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/2co-quickstart/2co-cart1.jpg" alt="2CO Cart1" title="2CO Cart1"></p>
+<p><img src="/images/2co-quickstart/2co-cart2.jpg" alt="2CO Cart2" title="2CO Cart2"></p>
+<h4 id="后端集成"><a href="#后端集成" class="headerlink" title="后端集成"></a>后端集成</h4><p>2Checkout 提供 系统回调通知的API URL, 会将返回结果通知给此 API</p>
+<ul>
+<li><p><a href="https://knowledgecenter.2checkout.com/Integration/09Webhooks/06Instant_Payment_Notification_(IPN" target="_blank" rel="noopener">IPN</a>)(Instant Payment Notification/及时付款通知):  此通知和 Paydollar/Paypal 类似, 当客户付款后, 会发起通知, 但当我们完成我们的业务行为后, 需要按照 2Checkout 的协议, 返回一个定义的格式字符串给到 2Checkout 告诉它我们已经做好了<br><img src="/images/2co-quickstart/2co-ipn.jpg" alt="2CO IPN" title="2CO IPN"></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"COMPANY_D"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"IPN_QTY[]"</span>: <span class="string">"1"</span>,</span><br><span class="line">  <span class="attr">"IPN_DISCOUNT[]"</span>: <span class="string">"0.00"</span>,</span><br><span class="line">  <span class="attr">"IPN_PRICE[]"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"IPADDRESS"</span>: <span class="string">"180.168.61.243"</span>,</span><br><span class="line">  <span class="attr">"FIRSTNAME"</span>: <span class="string">"John"</span>,</span><br><span class="line">  <span class="attr">"COUNTRY_D"</span>: <span class="string">"China"</span>,</span><br><span class="line">  <span class="attr">"IPN_VAT[]"</span>: <span class="string">"0.00"</span>,</span><br><span class="line">  <span class="attr">"COUNTRY"</span>: <span class="string">"China"</span>,</span><br><span class="line">  <span class="attr">"CUSTOMEREMAIL"</span>: <span class="string">"xxxx@mail.com"</span>,</span><br><span class="line">  <span class="attr">"LASTNAME"</span>: <span class="string">"Doe"</span>,</span><br><span class="line">  <span class="attr">"IPN_INFO[]"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"PAYMETHOD"</span>: <span class="string">"Visa/MasterCard"</span>,</span><br><span class="line">  <span class="attr">"REFNOEXT"</span>: <span class="string">"15107"</span>,</span><br><span class="line">  <span class="attr">"IPN_PNAME[]"</span>: <span class="string">"XXXXXXX Order 15107"</span>,</span><br><span class="line">  <span class="attr">"FRAUD_STATUS"</span>: <span class="string">"APPROVED"</span>,</span><br><span class="line">  <span class="attr">"IPN_SHIPPING"</span>: <span class="string">"0.00"</span>,</span><br><span class="line">  <span class="attr">"CBANKACCOUNT"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"PAYMETHOD_CODE"</span>: <span class="string">"CCVISAMC"</span>,</span><br><span class="line">  <span class="attr">"LASTNAME_D"</span>: <span class="string">"Doe"</span>,</span><br><span class="line">  <span class="attr">"CARD_EXPIRATION_DATE"</span>: <span class="string">"12/34"</span>,</span><br><span class="line">  <span class="attr">"IPCOUNTRY"</span>: <span class="string">"China"</span>,</span><br><span class="line">  <span class="attr">"COMPANY"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"HASH"</span>: <span class="string">"325b43b1aad14bb78832f222e6c268dd"</span>,</span><br><span class="line">  <span class="attr">"ZIPCODE_D"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"ORDERNO"</span>: <span class="string">"4"</span>,</span><br><span class="line">  <span class="attr">"ORDERSTATUS"</span>: <span class="string">"COMPLETE"</span>,</span><br><span class="line">  <span class="attr">"REFUND_TYPE"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"ADDRESS1_D"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"IPN_DELIVEREDCODES[]"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"FISCALCODE"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"CBANKNAME"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"STATE_D"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"PHONE"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"STATE"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"IPN_PROMONAME[]"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"CARD_TYPE"</span>: <span class="string">"visa"</span>,</span><br><span class="line">  <span class="attr">"IPN_TOTALGENERAL"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"REGISTRATIONNUMBER"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"REFNO"</span>: <span class="string">"95185621"</span>,</span><br><span class="line">  <span class="attr">"ADDRESS1"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"PHONE_D"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"ADDRESS2"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"EXTERNAL_CUSTOMER_REFERENCE"</span>: <span class="string">"XXXXXXXXXXXX"</span>,</span><br><span class="line">  <span class="attr">"CURRENCY"</span>: <span class="string">"USD"</span>,</span><br><span class="line">  <span class="attr">"IPN_TOTAL[]"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"FIRSTNAME_D"</span>: <span class="string">"John"</span>,</span><br><span class="line">  <span class="attr">"CARD_LAST_DIGITS"</span>: <span class="string">"1111"</span>,</span><br><span class="line">  <span class="attr">"SALEDATE"</span>: <span class="string">"2019-05-08 09:23:40"</span>,</span><br><span class="line">  <span class="attr">"ZIPCODE"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"IPN_COMMISSION"</span>: <span class="string">"0.9335"</span>,</span><br><span class="line">  <span class="attr">"IPN_VER[]"</span>: <span class="string">"1"</span>,</span><br><span class="line">  <span class="attr">"CITY_D"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"TEST_ORDER"</span>: <span class="string">"1"</span>,</span><br><span class="line">  <span class="attr">"IPN_PCODE[]"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"CITY"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"IPN_PID[]"</span>: <span class="string">"22136385"</span>,</span><br><span class="line">  <span class="attr">"IPN_DATE"</span>: <span class="string">"20190508095004"</span>,</span><br><span class="line">  <span class="attr">"ADDRESS2_D"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"FAX"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"IPN_SHIPPING_TAX"</span>: <span class="string">"0.00"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://knowledgecenter.2checkout.com/Integration/09Webhooks/Instant_Notification_Service_(INS" target="_blank" rel="noopener">INS</a>)(Instant Notification Service/及时通知服务): 它和 IPN 不太一样的是, 它会按照自己定义好的一些触发器, 例如 Order created/ Fraud status/ Invoice status 发送给预先定义好的通知路径, 他没有要求返回我们是否收到<br><img src="/images/2co-quickstart/2co-ins.jpg" alt="2CO INS" title="2CO INS"></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"sale_id"</span>: <span class="string">"250152202687"</span>,</span><br><span class="line">  <span class="attr">"item_rec_status_1"</span>: <span class="string">"live"</span>,</span><br><span class="line">  <span class="attr">"ship_street_address2"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"item_usd_amount_1"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"md5_hash"</span>: <span class="string">"30601638DEF96C18EA0FBFA29AE3C2A7"</span>,</span><br><span class="line">  <span class="attr">"item_name_1"</span>: <span class="string">"XXXXX Order 15107"</span>,</span><br><span class="line">  <span class="attr">"item_cust_amount_1"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"invoice_list_amount"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"bill_country"</span>: <span class="string">"CHN"</span>,</span><br><span class="line">  <span class="attr">"item_rec_list_amount_1"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"customer_ip_country"</span>: <span class="string">"China"</span>,</span><br><span class="line">  <span class="attr">"invoice_id"</span>: <span class="string">"250152202686"</span>,</span><br><span class="line">  <span class="attr">"ship_name"</span>: <span class="string">"Doe John"</span>,</span><br><span class="line">  <span class="attr">"bill_postal_code"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"item_count"</span>: <span class="string">"1"</span>,</span><br><span class="line">  <span class="attr">"ship_city"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"ship_postal_code"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"recurring"</span>: <span class="string">"0"</span>,</span><br><span class="line">  <span class="attr">"customer_first_name"</span>: <span class="string">"John"</span>,</span><br><span class="line">  <span class="attr">"customer_phone"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"key_count"</span>: <span class="string">"55"</span>,</span><br><span class="line">  <span class="attr">"ship_street_address"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"message_type"</span>: <span class="string">"FRAUD_STATUS_CHANGED"</span>,</span><br><span class="line">  <span class="attr">"bill_state"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"bill_street_address2"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"item_type_1"</span>: <span class="string">"bill"</span>,</span><br><span class="line">  <span class="attr">"ship_status"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"payment_type"</span>: <span class="string">"credit card"</span>,</span><br><span class="line">  <span class="attr">"vendor_id"</span>: <span class="string">"XXXXXXXXX"</span>,</span><br><span class="line">  <span class="attr">"customer_email"</span>: <span class="string">"xxx@mail.com"</span>,</span><br><span class="line">  <span class="attr">"invoice_usd_amount"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"invoice_status"</span>: <span class="string">"approved"</span>,</span><br><span class="line">  <span class="attr">"fraud_status"</span>: <span class="string">"pass"</span>,</span><br><span class="line">  <span class="attr">"bill_city"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"invoice_cust_amount"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"item_recurrence_1"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"customer_ip"</span>: <span class="string">"180.168.61.243"</span>,</span><br><span class="line">  <span class="attr">"ship_state"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"list_currency"</span>: <span class="string">"USD"</span>,</span><br><span class="line">  <span class="attr">"customer_last_name"</span>: <span class="string">"Doe"</span>,</span><br><span class="line">  <span class="attr">"item_list_amount_1"</span>: <span class="string">"16.67"</span>,</span><br><span class="line">  <span class="attr">"bill_street_address"</span>: <span class="string">"-"</span>,</span><br><span class="line">  <span class="attr">"timestamp"</span>: <span class="string">"2019-05-08 09:23:52"</span>,</span><br><span class="line">  <span class="attr">"item_id_1"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"auth_exp"</span>: <span class="string">"2019-05-15"</span>,</span><br><span class="line">  <span class="attr">"message_description"</span>: <span class="string">"Order fraud status changed"</span>,</span><br><span class="line">  <span class="attr">"vendor_order_id"</span>: <span class="string">"15107"</span>,</span><br><span class="line">  <span class="attr">"message_id"</span>: <span class="string">"14"</span>,</span><br><span class="line">  <span class="attr">"item_duration_1"</span>: <span class="string">"Forever"</span>,</span><br><span class="line">  <span class="attr">"item_rec_install_billed_1"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"cust_currency"</span>: <span class="string">"USD"</span>,</span><br><span class="line">  <span class="attr">"item_rec_date_next_1"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"ship_tracking_number"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"customer_name"</span>: <span class="string">"John Doe"</span>,</span><br><span class="line">  <span class="attr">"sale_date_placed"</span>: <span class="string">"2019-05-08 09:23:40"</span>,</span><br><span class="line">  <span class="attr">"ship_country"</span>: <span class="string">"CHN"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="API-式集成"><a href="#API-式集成" class="headerlink" title="API 式集成"></a>API 式集成</h3><p><a href="https://knowledgecenter.2checkout.com/API-Integration/REST_5.0_Reference#/reference/orders-with-dynamic-products/use-credit-cards" target="_blank" rel="noopener">Order With Dynamic Products</a></p>
+<p>API 式集成更多的是后端的集成, 这里有参考的链接 <a href="https://github.com/avangate/AvangateJavaApiSamples" target="_blank" rel="noopener">AvangateJavaApiSamples</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Checkout-支付/" rel="tag"># Checkout(支付)</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/12/rancher-install-guide-md/" rel="next" title="Rancher Installation Guide">
+                <i class="fa fa-chevron-left"></i> Rancher Installation Guide
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/12/aliyun-oss-sdk-quickstart/" rel="prev" title="Aliyun OSS Sdk Quickstart">
+                Aliyun OSS Sdk Quickstart <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/kenan.jpg" alt="Sky huang">
+            
+              <p class="site-author-name" itemprop="name">Sky huang</p>
+              <p class="site-description motion-element" itemprop="description">code nothing</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/SKYhuangjing" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:sky_1994@outlook.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#定位"><span class="nav-number">1.</span> <span class="nav-text">定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集成方案"><span class="nav-number">2.</span> <span class="nav-text">集成方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前提准备"><span class="nav-number">2.1.</span> <span class="nav-text">前提准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一站式集成"><span class="nav-number">2.2.</span> <span class="nav-text">一站式集成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#前端集成"><span class="nav-number">2.2.1.</span> <span class="nav-text">前端集成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#后端集成"><span class="nav-number">2.2.2.</span> <span class="nav-text">后端集成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API-式集成"><span class="nav-number">2.3.</span> <span class="nav-text">API 式集成</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sky huang</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
